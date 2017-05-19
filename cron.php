@@ -15,13 +15,19 @@
 
     function getTimeStamp() {return date("[Y-m-d H:i:s]",time());};
 
-    while($aRow = $oPools->fetch_assoc()) {
-        switch($aRow["APIType"]) {
+    while($aPool = $oPools->fetch_assoc()) {
+
+        $sPoolType = $aPool["APIType"];
+        $sPoolName = $aPool["Name"];
+        $iPoolID   = $aPool["ID"];
+        $sPoolAPI  = $aPool["API"];
+
+        switch($sPoolType) {
             case "node-cryptonote-pool":
 
                 // Get Main Stats
-                echo getTimeStamp()." Polling ".$aRow["Name"]." ... ";
-                $jsonData = file_get_contents($aRow["API"]."/stats",false,$webContext);
+                echo getTimeStamp()." Polling ".$sPoolName." ... ";
+                $jsonData = file_get_contents($sPoolAPI."/stats",false,$webContext);
                 if($jsonData === false) {
                     echo "Timed Out\n";
                     continue;
@@ -32,7 +38,7 @@
                 $iMiners = intval($aStats["pool"]["miners"]);
 
                 $SQL  = "INSERT INTO pool_meta (PoolID,TimeStamp,HashRate,Miners) VALUES (";
-                $SQL .= "'".$aRow["ID"]."',";
+                $SQL .= "'".$iPoolID."',";
                 $SQL .= "'".date("Y-m-d-H-i-s",time())."',";
                 $SQL .= "'".$dRate."',";
                 $SQL .= "'".$iMiners."')";
@@ -47,7 +53,7 @@
                     WHERE PoolID = '%s'
                     ORDER BY Height DESC
                     LIMIT 0, 1",
-                    $aRow["ID"]
+                    $iPoolID
                 );
                 $oLastBlock = $oDB->query($SQL);
                 if($oLastBlock->num_rows > 0) {
@@ -77,7 +83,7 @@
                         $SQL .= "INSERT INTO pool_blocks (";
                         $SQL .= "PoolID, Height, Hash, Difficulty, FoundTime, Luck, Reward, Share";
                         $SQL .= ") VALUES (";
-                        $SQL .= "'".$aRow["ID"]."',";
+                        $SQL .= "'".$iPoolID."',";
                         $SQL .= "'".$sHeight."',";
                         $SQL .= "'".$sHash."',";
                         $SQL .= "'".$iDiff."',";
@@ -105,17 +111,17 @@
                     FROM wallets AS w
                     LEFT JOIN pool_wallet AS pw ON w.ID = pw.WalletID
                     WHERE pw.PoolID = '%s'",
-                    $aRow["ID"]
+                    $iPoolID
                 );
                 $oWallets = $oDB->query($SQL);
                 while($aWallets = $oWallets->fetch_assoc()) {
                     echo getTimeStamp()." Getting stats for wallet ".$aWallets["Name"]." ... ";
-                    $jsonData = file_get_contents($aRow["API"]."/stats_address?longpool=false&address=".$aWallets["Address"],false,$webContext);
+                    $jsonData = file_get_contents($sPoolAPI."/stats_address?longpool=false&address=".$aWallets["Address"],false,$webContext);
                     if($jsonData === false) {
                         echo "Timed Out\n";
                         continue;
                     }
-                    $aMining  = json_decode($jsonData,true);
+                    $aMining = json_decode($jsonData,true);
                     echo "Success\n";
 
                     $iHashes    = intval(array_key_exists("hashes",$aMining["stats"]) ? $aMining["stats"]["hashes"] : 0);
@@ -123,7 +129,16 @@
                     $sLastShare = date("Y-m-d-H-i-s",$iLastShare);
                     $iBalance   = intval(array_key_exists("balance",$aMining["stats"]) ? $aMining["stats"]["balance"] : 0);
 
-                    $SQL = "SELECT TimeStamp, Hashes FROM mining WHERE TimeStamp >= '".date("Y-m-d-H-i-s",time()-3600)."' ORDER BY TimeStamp LIMIT 0,1";
+                    $SQL = sprintf(
+                       "SELECT TimeStamp, Hashes
+                        FROM mining
+                        WHERE TimeStamp >= '%s' AND WalletID = '%s' AND PoolID = '%s'
+                        ORDER BY TimeStamp
+                        LIMIT 0,1",
+                        date("Y-m-d-H-i-s",time()-3600),
+                        $aWallets["ID"],
+                        $iPoolID
+                    );
                     $oPrev = $oDB->query($SQL);
                     if($oPrev->num_rows > 0) {
                         $aPrev = $oPrev->fetch_assoc();
@@ -143,7 +158,7 @@
                     $SQL  = "INSERT INTO mining (TimeStamp,WalletID,PoolID,Hashes,LastShare,Balance,HashRate) VALUES (";
                     $SQL .= "'".date("Y-m-d-H-i-s",time())."',";
                     $SQL .= "'".$aWallets["ID"]."',";
-                    $SQL .= "'".$aRow["ID"]."',";
+                    $SQL .= "'".$iPoolID."',";
                     $SQL .= "'".$iHashes."',";
                     $SQL .= "'".$sLastShare."',";
                     $SQL .= "'".$iBalance."',";
