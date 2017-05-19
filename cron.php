@@ -22,7 +22,11 @@
                 // Get Main Stats
                 echo getTimeStamp()." Polling ".$aRow["Name"]." ... ";
                 $jsonData = file_get_contents($aRow["API"]."/stats",false,$webContext);
-                $aStats   = json_decode($jsonData,true);
+                if($jsonData === false) {
+                    echo "Timed Out\n";
+                    continue;
+                }
+                $aStats  = json_decode($jsonData,true);
 
                 $dRate   = floatval($aStats["pool"]["hashrate"]);
                 $iMiners = intval($aStats["pool"]["miners"]);
@@ -107,6 +111,10 @@
                 while($aWallets = $oWallets->fetch_assoc()) {
                     echo getTimeStamp()." Getting stats for wallet ".$aWallets["Name"]." ... ";
                     $jsonData = file_get_contents($aRow["API"]."/stats_address?longpool=false&address=".$aWallets["Address"],false,$webContext);
+                    if($jsonData === false) {
+                        echo "Timed Out\n";
+                        continue;
+                    }
                     $aMining  = json_decode($jsonData,true);
                     echo "Success\n";
 
@@ -119,11 +127,17 @@
                     $oPrev = $oDB->query($SQL);
                     if($oPrev->num_rows > 0) {
                         $aPrev = $oPrev->fetch_assoc();
-                        $iTimeDiff = $iLastShare-strtotime($aPrev["TimeStamp"]);
-                        $iHashDiff = $iHashes-intval($aPrev["Hashes"]);
-                        $dHashRate = $iHashDiff/$iTimeDiff;
+                        $iPrevTime = strtotime($aPrev["TimeStamp"]);
+                        $iPrevHash = intval($aPrev["Hashes"]);
+                        if($iPrevHash > 0) {
+                            $iTimeDiff = $iLastShare-$iPrevTime;
+                            $iHashDiff = $iHashes-$iPrevHash;
+                            $dHashRate = $iHashDiff/$iTimeDiff;
+                        } else {
+                            $dHashRate = -1.0;
+                        }
                     } else {
-                        $dHashRate  = 0.0;
+                        $dHashRate = 0.0;
                     }
 
                     $SQL  = "INSERT INTO mining (TimeStamp,WalletID,PoolID,Hashes,LastShare,Balance,HashRate) VALUES (";
