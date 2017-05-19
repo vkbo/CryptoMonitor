@@ -152,7 +152,7 @@
                 $SQL .= "'".$aDaily["AvgReward"]."',";
                 $SQL .= "'".$aDaily["SumReward"]."',";
                 $SQL .= "'".$aDaily["Count"]."',";
-                if($oDaily->num_rows > 0) {
+                if($oMeta->num_rows > 0) {
                     $aMeta = $oMeta->fetch_assoc();
                     $SQL .= "'".$aMeta["HashRate"]."',";
                     $SQL .= "'".$aMeta["Miners"]."',";
