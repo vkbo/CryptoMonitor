@@ -141,7 +141,7 @@
             $oMeta = $oDB->query($SQL);
             if($oDaily->num_rows > 0) {
                 $aDaily = $oDaily->fetch_assoc();
-                $SQL  = "INSERT INTO pool_blocks_daily (";
+                $SQL  = "INSERT INTO pool_daily (";
                 $SQL .= "TimeStamp, PoolID, AvgDifficulty, AvgLuck, AvgReward, ";
                 $SQL .= "SumReward, Blocks, HashRate, Miners, MetaEntries";
                 $SQL .= ") VALUES (";
