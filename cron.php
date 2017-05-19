@@ -115,6 +115,8 @@
                 );
                 $oWallets = $oDB->query($SQL);
                 while($aWallets = $oWallets->fetch_assoc()) {
+
+                    // Get Stats
                     echo getTimeStamp()." Getting stats for wallet ".$aWallets["Name"]." ... ";
                     $jsonData = file_get_contents($sPoolAPI."/stats_address?longpool=false&address=".$aWallets["Address"],false,$webContext);
                     if($jsonData === false) {
@@ -149,7 +151,7 @@
                             $iHashDiff = $iHashes-$iPrevHash;
                             $dHashRate = $iHashDiff/$iTimeDiff;
                         } else {
-                            $dHashRate = -1.0;
+                            $dHashRate = 0.0;
                         }
                     } else {
                         $dHashRate = 0.0;
@@ -165,6 +167,19 @@
                     $SQL .= "'".$dHashRate."')";
 
                     $oDB->query($SQL);
+
+                    // Calculate Hourly Averages
+
+                    $SQL = sprintf(
+                       "SELECT TimeStamp
+                        FROM mining
+                        WHERE TimeStamp >= '%s' AND WalletID = '%s' AND PoolID = '%s'
+                        ORDER BY TimeStamp
+                        LIMIT 0,1",
+                        date("Y-m-d-H-i-s",time()-3600),
+                        $aWallets["ID"],
+                        $iPoolID
+                    );
                 }
 
                 break;
