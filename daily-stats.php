@@ -18,6 +18,8 @@
 
     while($aPool = $oPools->fetch_assoc()) {
 
+        // Daily Mining
+
         $SQL = sprintf(
            "SELECT
             w.ID AS ID,
@@ -31,8 +33,7 @@
         $oWallet = $oDB->query($SQL);
         while($aWallet = $oWallet->fetch_assoc()) {
 
-            // Calculate Hourly Averages
-            echo getTimeStamp()." Calculating daily averages ";
+            echo getTimeStamp()." Calculating daily mining averages ";
 
             $SQL = sprintf(
                "SELECT TimeStamp
@@ -82,7 +83,86 @@
                     $SQL .= "'".$aDaily["Entries"]."')";
                     $oDB->query($SQL);
                 }
+            }
+        }
 
+        // Daily Pool
+
+        echo getTimeStamp()." Calculating daily pool averages ";
+
+        $SQL = sprintf(
+           "SELECT TimeStamp
+            FROM pool_blocks_daily
+            WHERE PoolID = '%s'
+            ORDER BY TimeStamp DESC
+            LIMIT 0, 1",
+            $aPool["ID"]
+        );
+        $oDaily = $oDB->query($SQL);
+        if($oDaily->num_rows > 0) {
+            $aTemp = $oDaily->fetch_assoc();
+            $iLastDay = strtotime($aTemp["TimeStamp"])+86400;
+        } else {
+            $iLastDay = roundDay(time()-7*86400);
+        }
+        echo "since ".date("Y-m-d H:i:s",$iLastDay)."\n";
+        $iCurrDay = roundDay(time());
+        for($iStart = $iLastDay; $iStart < $iCurrDay; $iStart += 86400) {
+            echo getTimeStamp()." Averaging for ".date("Y-m-d H:i:s",$iStart)."\n";
+            $SQL = sprintf(
+               "SELECT
+                COUNT(ID) AS Count,
+                ROUND(AVG(Difficulty)) AS AvgDifficulty,
+                ROUND(AVG(Luck)) AS AvgLuck,
+                ROUND(AVG(Reward)) AS AvgReward,
+                SUM(Reward) AS SumReward
+                FROM pool_blocks
+                WHERE PoolID = '%s'
+                AND FoundTime >= '%s' AND FoundTime < '%s'
+                HAVING AVG(Difficulty) IS NOT NULL",
+                $aPool["ID"],
+                date("Y-m-d-H-i-s",$iStart),
+                date("Y-m-d-H-i-s",$iStart+86400)
+            );
+            $oDaily = $oDB->query($SQL);
+            $SQL = sprintf(
+               "SELECT
+                COUNT(ID) AS Entries,
+                AVG(HashRate) AS HashRate,
+                ROUND(AVG(Miners)) AS Miners
+                FROM pool_meta
+                WHERE PoolID = '%s'
+                AND TimeStamp >= '%s' AND TimeStamp < '%s'
+                HAVING AVG(HashRate) IS NOT NULL",
+                $aPool["ID"],
+                date("Y-m-d-H-i-s",$iStart),
+                date("Y-m-d-H-i-s",$iStart+86400)
+            );
+            $oMeta = $oDB->query($SQL);
+            if($oDaily->num_rows > 0) {
+                $aDaily = $oDaily->fetch_assoc();
+                $SQL  = "INSERT INTO pool_blocks_daily (";
+                $SQL .= "TimeStamp, PoolID, AvgDifficulty, AvgLuck, AvgReward, ";
+                $SQL .= "SumReward, Blocks, HashRate, Miners, MetaEntries";
+                $SQL .= ") VALUES (";
+                $SQL .= "'".date("Y-m-d-H-i-s",$iStart)."',";
+                $SQL .= "'".$aPool["ID"]."',";
+                $SQL .= "'".$aDaily["AvgDifficulty"]."',";
+                $SQL .= "'".$aDaily["AvgLuck"]."',";
+                $SQL .= "'".$aDaily["AvgReward"]."',";
+                $SQL .= "'".$aDaily["SumReward"]."',";
+                $SQL .= "'".$aDaily["Count"]."',";
+                if($oDaily->num_rows > 0) {
+                    $aMeta = $oMeta->fetch_assoc();
+                    $SQL .= "'".$aMeta["HashRate"]."',";
+                    $SQL .= "'".$aMeta["Miners"]."',";
+                    $SQL .= "'".$aMeta["Entries"]."')";
+                } else {
+                    $SQL .= "'0.0',";
+                    $SQL .= "'0',";
+                    $SQL .= "'0')";
+                }
+                $oDB->query($SQL);
             }
         }
     }
