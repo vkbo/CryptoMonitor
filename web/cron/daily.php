@@ -44,7 +44,7 @@
             $iCurrDay = roundDay(time());
             for($iStart = $iLastDay; $iStart < $iCurrDay; $iStart += 86400) {
 
-                echo getTimeStamp()." Averaging for ".date("Y-m-d H:i",$iStart)."\n";
+                echo getTimeStamp()." Averaging for ".date("Y-m-d",$iStart)."\n";
                 $SQL  = "SELECT ";
                 $SQL .= "COUNT(ID) AS Entries, ";
                 $SQL .= "MAX(Hashes) AS Hashes, ";
@@ -104,7 +104,7 @@
         $iCurrDay = roundDay(time());
         for($iStart = $iLastDay; $iStart < $iCurrDay; $iStart += 86400) {
 
-            echo getTimeStamp()." Averaging for ".date("Y-m-d H:i",$iStart)."\n";
+            echo getTimeStamp()." Averaging for ".date("Y-m-d",$iStart)."\n";
             $SQL  = "SELECT ";
             $SQL .= "COUNT(ID) AS Count, ";
             $SQL .= "ROUND(AVG(Difficulty)) AS AvgDifficulty, ";
