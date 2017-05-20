@@ -28,8 +28,8 @@
             WHERE pw.PoolID = '%s'",
             $aPool["ID"]
         );
-        $oWallet = $oDB->query($SQL);
-        while($aWallet = $oWallet->fetch_assoc()) {
+        $oWallets = $oDB->query($SQL);
+        while($aWallet = $oWallets->fetch_assoc()) {
 
             // Calculate Hourly Averages
             echo getTimeStamp()." Calculating hourly averages ";
@@ -50,7 +50,9 @@
             } else {
                 $iLastHour = roundHour(time()-7*86400);
             }
+            $oHourly->close();
             echo "since ".date("Y-m-d H:i:s",$iLastHour)."\n";
+
             $iCurrHour = roundHour(time());
             for($iStart = $iLastHour; $iStart < $iCurrHour; $iStart += 3600) {
                 echo getTimeStamp()." Averaging for ".date("Y-m-d H:i:s",$iStart)."\n";
@@ -82,8 +84,10 @@
                     $SQL .= "'".$aHourly["Entries"]."')";
                     $oDB->query($SQL);
                 }
-
+                $oHourly->close();
             }
         }
+        $oWallets->close();
     }
+    $oPools->close();
 ?>

@@ -119,11 +119,17 @@
                     $iPoolID
                 );
                 $oWallets = $oDB->query($SQL);
-                while($aWallets = $oWallets->fetch_assoc()) {
+                if($oWallets === false) {
+                    echo getTimeStamp()." Wallets query error. Breaking\n";
+                    echo getTimeStamp()." SQL: ".preg_replace("!\s+!"," ",$SQL)."\n";
+                    echo getTimeStamp()." Error: ".$oDB->error."\n";
+                    break;
+                }
+                while($aWallet = $oWallets->fetch_assoc()) {
 
                     // Get Stats
-                    echo getTimeStamp()." Getting stats for wallet ".$aWallets["Name"]." ... ";
-                    $sAPICall = $sPoolAPI."/stats_address?longpool=false&address=".$aWallets["Address"];
+                    echo getTimeStamp()." Getting stats for wallet ".$aWallet["Name"]." ... ";
+                    $sAPICall = $sPoolAPI."/stats_address?longpool=false&address=".$aWallet["Address"];
                     $jsonData = file_get_contents($sAPICall,false,$webContext);
                     if($jsonData === false) {
                         echo "Timed Out\n";
@@ -148,7 +154,7 @@
                         ORDER BY TimeStamp
                         LIMIT 0,1",
                         date("Y-m-d-H-i-s",time()-3600),
-                        $aWallets["ID"],
+                        $aWallet["ID"],
                         $iPoolID
                     );
                     $oPrev = $oDB->query($SQL);
@@ -169,7 +175,7 @@
 
                     $SQL  = "INSERT INTO mining (TimeStamp,WalletID,PoolID,Hashes,LastShare,Balance,HashRate) VALUES (";
                     $SQL .= "'".date("Y-m-d-H-i-s",time())."',";
-                    $SQL .= "'".$aWallets["ID"]."',";
+                    $SQL .= "'".$aWallet["ID"]."',";
                     $SQL .= "'".$iPoolID."',";
                     $SQL .= "'".$iHashes."',";
                     $SQL .= "'".$sLastShare."',";
@@ -179,6 +185,7 @@
                     $oDB->query($SQL);
 
                 }
+                $oWallets->close();
 
                 break;
 
@@ -187,4 +194,6 @@
                 break;
         }
     }
+
+    $oPools->close();
 ?>

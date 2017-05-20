@@ -30,8 +30,8 @@
             WHERE pw.PoolID = '%s'",
             $aPool["ID"]
         );
-        $oWallet = $oDB->query($SQL);
-        while($aWallet = $oWallet->fetch_assoc()) {
+        $oWallets = $oDB->query($SQL);
+        while($aWallet = $oWallets->fetch_assoc()) {
 
             echo getTimeStamp()." Calculating daily mining averages ";
 
@@ -51,7 +51,9 @@
             } else {
                 $iLastDay = roundDay(time()-7*86400);
             }
+            $oDaily->close();
             echo "since ".date("Y-m-d H:i:s",$iLastDay)."\n";
+
             $iCurrDay = roundDay(time());
             for($iStart = $iLastDay; $iStart < $iCurrDay; $iStart += 86400) {
                 echo getTimeStamp()." Averaging for ".date("Y-m-d H:i:s",$iStart)."\n";
@@ -83,8 +85,10 @@
                     $SQL .= "'".$aDaily["Entries"]."')";
                     $oDB->query($SQL);
                 }
+                $oDaily->close();
             }
         }
+        $oWallets->close();
 
         // Daily Pool
 
@@ -105,7 +109,9 @@
         } else {
             $iLastDay = roundDay(time()-7*86400);
         }
+        $oDaily->close();
         echo "since ".date("Y-m-d H:i:s",$iLastDay)."\n";
+
         $iCurrDay = roundDay(time());
         for($iStart = $iLastDay; $iStart < $iCurrDay; $iStart += 86400) {
             echo getTimeStamp()." Averaging for ".date("Y-m-d H:i:s",$iStart)."\n";
@@ -138,6 +144,7 @@
                 date("Y-m-d-H-i-s",$iStart),
                 date("Y-m-d-H-i-s",$iStart+86400)
             );
+
             $oMeta = $oDB->query($SQL);
             if($oDaily->num_rows > 0) {
                 $aDaily = $oDaily->fetch_assoc();
@@ -164,6 +171,9 @@
                 }
                 $oDB->query($SQL);
             }
+            $oDaily->close();
+            $oMeta->close();
         }
     }
+    $oPools->close();
 ?>
