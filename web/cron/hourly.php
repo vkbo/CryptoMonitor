@@ -44,7 +44,7 @@
             $iCurrHour = roundHour(time());
             for($iStart = $iLastHour; $iStart < $iCurrHour; $iStart += 3600) {
 
-                echo getTimeStamp()." Averaging for ".date("Y-m-d H:i:s",$iStart)."\n";
+                echo getTimeStamp()." Averaging for ".date("Y-m-d H:i",$iStart)."\n";
                 $SQL  = "SELECT ";
                 $SQL .= "COUNT(ID) AS Entries, ";
                 $SQL .= "MAX(Hashes) AS Hashes, ";
