@@ -34,7 +34,7 @@
                 }
                 if(in_array("Content-Encoding: deflate",$http_response_header)) {
                     $jsonData = gzinflate($jsonData);
-                    echo "(deflated) ";
+                    echo "Deflated, ";
                 }
                 $aStats  = json_decode($jsonData,true);
 
@@ -77,7 +77,7 @@
 
                         $aBlocks = explode(":",$sBlocks);
                         if(count($aBlocks) < 6) continue;
-                        if(intval($aBlocks[4]) == 0) continue;
+                        if(intval($aBlocks[4]) != 0) continue;
 
                         $sHash = $aBlocks[0];
                         $sTime = date("Y-m-d-H-i-s",intval($aBlocks[1]));
@@ -131,7 +131,7 @@
                     }
                     if(in_array("Content-Encoding: deflate",$http_response_header)) {
                         $jsonData = gzinflate($jsonData);
-                        echo "(deflated) ";
+                        echo "Deflated, ";
                     }
                     $aMining = json_decode($jsonData,true);
                     echo "Success\n";
@@ -178,18 +178,6 @@
 
                     $oDB->query($SQL);
 
-                    // Calculate Hourly Averages
-
-                    $SQL = sprintf(
-                       "SELECT TimeStamp
-                        FROM mining
-                        WHERE TimeStamp >= '%s' AND WalletID = '%s' AND PoolID = '%s'
-                        ORDER BY TimeStamp
-                        LIMIT 0,1",
-                        date("Y-m-d-H-i-s",time()-3600),
-                        $aWallets["ID"],
-                        $iPoolID
-                    );
                 }
 
                 break;
