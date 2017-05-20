@@ -26,15 +26,15 @@
             case "node-cryptonote-pool":
 
                 // Get Main Stats
-                echo getTimeStamp()." Polling ".$sPoolName." ... ";
+                echo getTimeStamp()." Polling ".$sPoolName."\n";
                 $jsonData = file_get_contents($sPoolAPI."/stats",false,$webContext);
                 if($jsonData === false) {
-                    echo "Timed Out\n";
+                    echo getTimeStamp()." Could not connect to API\n";
                     continue;
                 }
                 if(in_array("Content-Encoding: deflate",$http_response_header)) {
                     $jsonData = gzinflate($jsonData);
-                    echo "Deflated, ";
+                    echo getTimeStamp()." Unpacking data\n";
                 }
                 $aStats  = json_decode($jsonData,true);
 
@@ -47,7 +47,6 @@
                 $SQL .= "'".$dRate."',";
                 $SQL .= "'".$iMiners."')";
                 $oDB->query($SQL);
-                echo "Success\n";
 
                 $nBlocks = floor(count($aStats["pool"]["blocks"])/2);
 
@@ -67,7 +66,6 @@
                     $iLastBlock = 0;
                 }
                 $nNew = 0;
-                $SQL  = "";
 
                 for($i=0; $i<$nBlocks; $i++) {
                     $sBlocks = $aStats["pool"]["blocks"][$i*2];
@@ -85,7 +83,7 @@
                         $iLuck = intval($aBlocks[3]);
                         $iPaid = intval($aBlocks[5]);
 
-                        $SQL .= "INSERT INTO pool_blocks (";
+                        $SQL  = "INSERT INTO pool_blocks (";
                         $SQL .= "PoolID, Height, Hash, Difficulty, FoundTime, Luck, Reward, Share";
                         $SQL .= ") VALUES (";
                         $SQL .= "'".$iPoolID."',";
@@ -95,16 +93,14 @@
                         $SQL .= "'".$sTime."',";
                         $SQL .= "'".$iLuck."',";
                         $SQL .= "'".$iPaid."',";
-                        $SQL .= "'0');\n";
+                        $SQL .= "'0')";
+                        $oDB->query($SQL);
 
                         $nNew++;
                     }
                 }
-                $oDB->multi_query($SQL);
                 if($nNew > 0) {
-                    echo getTimeStamp()." Added ".$nNew." new blocks\n";
-                } else {
-                    echo getTimeStamp()." No new blocks\n";
+                    echo getTimeStamp()." Added ".$nNew." new block".($nNew>1?"s":"")."\n";
                 }
 
                 // Wallet Stats
@@ -128,19 +124,18 @@
                 while($aWallet = $oWallets->fetch_assoc()) {
 
                     // Get Stats
-                    echo getTimeStamp()." Getting stats for wallet ".$aWallet["Name"]." ... ";
+                    echo getTimeStamp()." Getting stats for wallet ".$aWallet["Name"]."@".$sPoolName."\n";
                     $sAPICall = $sPoolAPI."/stats_address?longpool=false&address=".$aWallet["Address"];
                     $jsonData = file_get_contents($sAPICall,false,$webContext);
                     if($jsonData === false) {
-                        echo "Timed Out\n";
+                        echo getTimeStamp()." Could not connect to API\n";
                         continue;
                     }
                     if(in_array("Content-Encoding: deflate",$http_response_header)) {
                         $jsonData = gzinflate($jsonData);
-                        echo "Deflated, ";
+                        echo getTimeStamp()." Unpacking data\n";
                     }
                     $aMining = json_decode($jsonData,true);
-                    echo "Success\n";
 
                     $iHashes    = intval(array_key_exists("hashes",$aMining["stats"]) ? $aMining["stats"]["hashes"] : 0);
                     $iLastShare = intval(array_key_exists("lastShare",$aMining["stats"]) ? $aMining["stats"]["lastShare"] : 0);
@@ -196,4 +191,5 @@
     }
 
     $oPools->close();
+    $oDB->close();
 ?>
