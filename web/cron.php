@@ -32,6 +32,10 @@
                     echo "Timed Out\n";
                     continue;
                 }
+                if(in_array("Content-Encoding: deflate",$http_response_header)) {
+                    $jsonData = gzinflate($jsonData);
+                    echo "(deflated) ";
+                }
                 $aStats  = json_decode($jsonData,true);
 
                 $dRate   = floatval($aStats["pool"]["hashrate"]);
@@ -73,6 +77,7 @@
 
                         $aBlocks = explode(":",$sBlocks);
                         if(count($aBlocks) < 6) continue;
+                        if(intval($aBlocks[4]) == 0) continue;
 
                         $sHash = $aBlocks[0];
                         $sTime = date("Y-m-d-H-i-s",intval($aBlocks[1]));
@@ -118,10 +123,15 @@
 
                     // Get Stats
                     echo getTimeStamp()." Getting stats for wallet ".$aWallets["Name"]." ... ";
-                    $jsonData = file_get_contents($sPoolAPI."/stats_address?longpool=false&address=".$aWallets["Address"],false,$webContext);
+                    $sAPICall = $sPoolAPI."/stats_address?longpool=false&address=".$aWallets["Address"];
+                    $jsonData = file_get_contents($sAPICall,false,$webContext);
                     if($jsonData === false) {
                         echo "Timed Out\n";
                         continue;
+                    }
+                    if(in_array("Content-Encoding: deflate",$http_response_header)) {
+                        $jsonData = gzinflate($jsonData);
+                        echo "(deflated) ";
                     }
                     $aMining = json_decode($jsonData,true);
                     echo "Success\n";

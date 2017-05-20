@@ -1,0 +1,16 @@
+/**
+ *  Crypto Monitor – Main CSS File
+ * ================================
+ *  Created 2017-05-19
+ */
+
+body {
+    padding: 40px;
+}
+
+.plot {
+    width: 1000px;
+    height: 500px;
+    border: 1px solid #000000;
+    position: relative;
+}

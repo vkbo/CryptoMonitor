@@ -66,7 +66,7 @@ CREATE TABLE `pools` (
   `CurrencyID` int(11) DEFAULT NULL,
   `Active` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 # Pool Blocks Table
 

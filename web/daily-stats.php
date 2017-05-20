@@ -92,7 +92,7 @@
 
         $SQL = sprintf(
            "SELECT TimeStamp
-            FROM pool_blocks_daily
+            FROM pool_daily
             WHERE PoolID = '%s'
             ORDER BY TimeStamp DESC
             LIMIT 0, 1",
