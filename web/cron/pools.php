@@ -206,7 +206,15 @@
                 $dHashRate = 0.0;
             }
 
-            $SQL  = "INSERT INTO mining (TimeStamp,WalletID,PoolID,Hashes,LastShare,Balance,HashRate) VALUES (";
+            $SQL  = "INSERT INTO mining (";
+            $SQL .= "TimeStamp, ";
+            $SQL .= "WalletID, ";
+            $SQL .= "PoolID, ";
+            $SQL .= "Hashes, ";
+            $SQL .= "LastShare, ";
+            $SQL .= "Balance, ";
+            $SQL .= "HashRate";
+            $SQL .= ") VALUES (";
             $SQL .= "'".date("Y-m-d-H-i-s",$iTimeStamp)."',";
             $SQL .= "'".$aWallet["ID"]."',";
             $SQL .= "'".$iPoolID."',";

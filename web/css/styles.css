@@ -14,3 +14,31 @@ body {
     border: 1px solid #000000;
     position: relative;
 }
+
+.latest-earnings {
+    border: 1px solid #666666;
+}
+
+.latest-earnings td {
+    padding: 4px;
+}
+
+.values {
+    font-family: 'Source Code Pro', monospace;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.green {
+    color: #009900;
+}
+
+.red {
+    color: #990000;
+}
