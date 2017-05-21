@@ -25,17 +25,17 @@
 
             echo getTimeStamp()." Calculating hourly wallet averages for ".$aWallet["Name"]." on ".$sPoolName."\n";
 
-            $SQL  = "SELECT TimeStamp ";
+            $SQL  = "SELECT Hour ";
             $SQL .= "FROM mining_hourly ";
             $SQL .= "WHERE WalletID = '".$aWallet["ID"]."' ";
             $SQL .= "AND PoolID = '".$iPoolID."' ";
-            $SQL .= "ORDER BY TimeStamp DESC ";
+            $SQL .= "ORDER BY Hour DESC ";
             $SQL .= "LIMIT 0, 1";
             $oHourly = $oDB->query($SQL);
 
             if($oHourly->num_rows > 0) {
                 $aTemp = $oHourly->fetch_assoc();
-                $iLastHour = strtotime($aTemp["TimeStamp"])+3600;
+                $iLastHour = strtotime($aTemp["Hour"])+3600;
             } else {
                 $iLastHour = roundHour(time()-7*86400);
             }
@@ -61,7 +61,15 @@
                 if($oHourly->num_rows > 0) {
 
                     $aHourly = $oHourly->fetch_assoc();
-                    $SQL  = "INSERT INTO mining_hourly (TimeStamp,WalletID,PoolID,Hashes,Balance,HashRate,Entries) VALUES (";
+                    $SQL  = "INSERT INTO mining_hourly (";
+                    $SQL .= "Hour, ";
+                    $SQL .= "WalletID, ";
+                    $SQL .= "PoolID, ";
+                    $SQL .= "Hashes, ";
+                    $SQL .= "Balance, ";
+                    $SQL .= "HashRate, ";
+                    $SQL .= "Entries";
+                    $SQL .= ") VALUES (";
                     $SQL .= "'".date("Y-m-d-H-i-s",$iStart)."',";
                     $SQL .= "'".$aWallet["ID"]."',";
                     $SQL .= "'".$aPool["ID"]."',";

@@ -20,10 +20,14 @@
     $aPoll   = array("00","05","10","15","20","25","30","35","40","45","50","55");
     // END Cron Settings
 
-    if(!$bSave) echo getTimeStamp()." Running in test mode\n";
-
     $sHour = date("H:i",time());
     $sMin  = date("i",time());
+
+    if(!$bSave) {
+        echo getTimeStamp()." Running in test mode\n";
+        $sHour = "00:00";
+        $sMin  = "00";
+    }
 
     $oDB    = new mysqli($cDBHost,$cDBUser,$cDBPass,$cDBMain);
     $oPools = $oDB->query("SELECT * FROM pools WHERE Active = 1");

@@ -32,6 +32,7 @@
         $sPoolName = $aPool["Name"];
         $iPoolID   = $aPool["ID"];
         $sPoolAPI  = $aPool["API"];
+        $sPoolOpt  = $aPool["APIOptions"];
 
         echo getTimeStamp()." Polling ".$sPoolName."\n";
 
@@ -41,20 +42,6 @@
             echo getTimeStamp()." Could not connect to API\n";
             return;
         }
-        $dRate   = floatval($aStats["pool"]["hashrate"]);
-        $iMiners = intval($aStats["pool"]["miners"]);
-
-        $SQL  = "INSERT INTO pool_meta (";
-        $SQL .= "PoolID, ";
-        $SQL .= "TimeStamp, ";
-        $SQL .= "HashRate, ";
-        $SQL .= "Miners";
-        $SQL .= ") VALUES (";
-        $SQL .= "'".$iPoolID."', ";
-        $SQL .= "'".date("Y-m-d-H-i-s",time())."', ";
-        $SQL .= "'".$dRate."', ";
-        $SQL .= "'".$iMiners."')";
-        if($bSave) $oDB->query($SQL);
 
         $SQL  = "SELECT Height ";
         $SQL .= "FROM pool_blocks ";
@@ -71,6 +58,7 @@
         }
 
         $nNew     = 0;
+        $nPending = 0;
         $nBlocks  = floor(count($aStats["pool"]["blocks"])/2);
 
         for($i=0; $i<$nBlocks; $i++) {
@@ -82,8 +70,24 @@
                 $aBlocks = explode(":",$sBlocks);
                 $nBits   = count($aBlocks);
 
-                // If there is less then 6 elements, this is a pending block in the default API
-                if($nBits < 6) continue;
+                // Check that the block is mature
+                $bPending = false;
+                switch($sPoolOpt) {
+                    case "cpfr":
+                        // Customised API with longer block strings
+                        if($sPoolOpt == "cpfr" && $nBits != 10) {
+                            $nPending++;
+                            $bPending = true;
+                        }
+                        break;
+                    default:
+                        if($nBits != 6) {
+                            $nPending++;
+                            $bPending = true;
+                        }
+                        break;
+                }
+                if($bPending) continue;
 
                 $sHash = $aBlocks[0];
                 $sTime = date("Y-m-d-H-i-s",intval($aBlocks[1]));
@@ -92,9 +96,10 @@
                 $iOrph = intval($aBlocks[4]);
                 $iPaid = intval($aBlocks[5]);
 
-                // This is crypto-pool.fr who uses 6 elements for pending and 10 for non-pending
-                // blocks. For pending blocks a different value is stored in element 4.
-                if($iOrph > 1 && $nBits == 6) continue;
+                if($iOrph > 1) {
+                    echo getTimeStamp()." Unknown block status for block ".$sHeight."\n";
+                    continue;
+                }
 
                 $SQL  = "INSERT INTO pool_blocks (";
                 $SQL .= "PoolID, ";
@@ -119,9 +124,27 @@
                 $nNew++;
             }
         }
-        if($nNew > 0) {
-            echo getTimeStamp()." Added ".$nNew." new block".($nNew>1?"s":"")."\n";
-        }
+        echo getTimeStamp()." ".$nNew." new block".($nNew!=1?"s":"").", ".$nPending." pending\n";
+
+        // Pool Meta
+        $dRate   = floatval($aStats["pool"]["hashrate"]);
+        $iMiners = intval($aStats["pool"]["miners"]);
+
+        $SQL  = "INSERT INTO pool_meta (";
+        $SQL .= "PoolID, ";
+        $SQL .= "TimeStamp, ";
+        $SQL .= "HashRate, ";
+        $SQL .= "Miners,";
+        $SQL .= "NewBlocks,";
+        $SQL .= "PendingBlocks";
+        $SQL .= ") VALUES (";
+        $SQL .= "'".$iPoolID."', ";
+        $SQL .= "'".date("Y-m-d-H-i-s",time())."', ";
+        $SQL .= "'".$dRate."', ";
+        $SQL .= "'".$iMiners."',";
+        $SQL .= "'".$nNew."',";
+        $SQL .= "'".$nPending."')";
+        if($bSave) $oDB->query($SQL);
 
         // Wallet Stats
         $SQL  = "SELECT ";

@@ -25,17 +25,17 @@
 
             echo getTimeStamp()." Calculating daily wallet averages for ".$aWallet["Name"]." on ".$sPoolName."\n";
 
-            $SQL  = "SELECT TimeStamp ";
+            $SQL  = "SELECT Day ";
             $SQL .= "FROM mining_daily ";
             $SQL .= "WHERE WalletID = '".$aWallet["ID"]."' ";
             $SQL .= "AND PoolID = '".$iPoolID."' ";
-            $SQL .= "ORDER BY TimeStamp DESC ";
+            $SQL .= "ORDER BY Day DESC ";
             $SQL .= "LIMIT 0, 1";
             $oDaily = $oDB->query($SQL);
 
             if($oDaily->num_rows > 0) {
                 $aTemp = $oDaily->fetch_assoc();
-                $iLastDay = strtotime($aTemp["TimeStamp"])+86400;
+                $iLastDay = strtotime($aTemp["Day"])+86400;
             } else {
                 $iLastDay = roundDay(time()-7*86400);
             }
@@ -61,8 +61,8 @@
                 if($oDaily->num_rows > 0) {
 
                     $aDaily = $oDaily->fetch_assoc();
-                    $SQL  = "INSERT INTO mining_daily (TimeStamp,WalletID,PoolID,Hashes,Balance,HashRate,Entries) VALUES (";
-                    $SQL .= "'".date("Y-m-d-H-i-s",$iStart)."',";
+                    $SQL  = "INSERT INTO mining_daily (Day,WalletID,PoolID,Hashes,Balance,HashRate,Entries) VALUES (";
+                    $SQL .= "'".date("Y-m-d",$iStart)."',";
                     $SQL .= "'".$aWallet["ID"]."',";
                     $SQL .= "'".$aPool["ID"]."',";
                     $SQL .= "'".$aDaily["Hashes"]."',";
@@ -86,16 +86,16 @@
 
         echo getTimeStamp()." Calculating daily pool averages for ".$sPoolName."\n";
 
-        $SQL  = "SELECT TimeStamp ";
+        $SQL  = "SELECT Day ";
         $SQL .= "FROM pool_daily ";
         $SQL .= "WHERE PoolID = '".$iPoolID."' ";
-        $SQL .= "ORDER BY TimeStamp DESC ";
+        $SQL .= "ORDER BY Day DESC ";
         $SQL .= "LIMIT 0, 1";
         $oDaily = $oDB->query($SQL);
 
         if($oDaily->num_rows > 0) {
             $aTemp = $oDaily->fetch_assoc();
-            $iLastDay = strtotime($aTemp["TimeStamp"])+86400;
+            $iLastDay = strtotime($aTemp["Day"])+86400;
         } else {
             $iLastDay = roundDay(time()-7*86400);
         }
@@ -134,10 +134,10 @@
 
                 $aBlocks = $oBlocks->fetch_assoc();
                 $SQL  = "INSERT INTO pool_daily (";
-                $SQL .= "TimeStamp, PoolID, AvgDifficulty, AvgLuck, AvgReward, ";
+                $SQL .= "Day, PoolID, AvgDifficulty, AvgLuck, AvgReward, ";
                 $SQL .= "SumReward, Blocks, Orphaned, HashRate, Miners, MetaEntries";
                 $SQL .= ") VALUES (";
-                $SQL .= "'".date("Y-m-d-H-i-s",$iStart)."',";
+                $SQL .= "'".date("Y-m-d",$iStart)."',";
                 $SQL .= "'".$iPoolID."',";
                 $SQL .= "'".$aBlocks["AvgDifficulty"]."',";
                 $SQL .= "'".$aBlocks["AvgLuck"]."',";
@@ -151,8 +151,8 @@
                     $SQL .= "'".$aMeta["Miners"]."',";
                     $SQL .= "'".$aMeta["Entries"]."')";
                 } else {
-                    $SQL .= "'0.0',";
-                    $SQL .= "'0',";
+                    $SQL .= "NULL,";
+                    $SQL .= "NULL,";
                     $SQL .= "'0')";
                 }
                 if($bSave) $oDB->query($SQL);

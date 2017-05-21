@@ -29,7 +29,7 @@ CREATE TABLE `mining` (
 
 CREATE TABLE `mining_hourly` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `TimeStamp` datetime DEFAULT NULL,
+  `Hour` datetime DEFAULT NULL,
   `WalletID` int(11) DEFAULT NULL,
   `PoolID` int(11) DEFAULT NULL,
   `Hashes` bigint(20) DEFAULT NULL,
@@ -37,14 +37,14 @@ CREATE TABLE `mining_hourly` (
   `HashRate` double DEFAULT NULL,
   `Entries` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  KEY `MainIDX` (`TimeStamp`,`WalletID`,`PoolID`)
+  KEY `MainIDX` (`Hour`,`WalletID`,`PoolID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Mining Daily Stats Table
 
 CREATE TABLE `mining_daily` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `TimeStamp` datetime DEFAULT NULL,
+  `Day` datetime DEFAULT NULL,
   `WalletID` int(11) DEFAULT NULL,
   `PoolID` int(11) DEFAULT NULL,
   `Hashes` bigint(20) DEFAULT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE `mining_daily` (
   `HashRate` double DEFAULT NULL,
   `Entries` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
-  KEY `MainIDX` (`TimeStamp`,`WalletID`,`PoolID`)
+  KEY `MainIDX` (`Day`,`WalletID`,`PoolID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Pools Table
@@ -63,6 +63,7 @@ CREATE TABLE `pools` (
   `URL` varchar(255) DEFAULT NULL,
   `API` varchar(255) DEFAULT NULL,
   `APIType` varchar(45) DEFAULT NULL,
+  `APIOptions` varchar(255) DEFAULT NULL,
   `CurrencyID` int(11) DEFAULT NULL,
   `Active` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`ID`)
@@ -92,6 +93,8 @@ CREATE TABLE `pool_meta` (
   `PoolID` int(11) DEFAULT NULL,
   `HashRate` double DEFAULT NULL,
   `Miners` int(11) DEFAULT NULL,
+  `NewBlocks` int(11) DEFAULT NULL,
+  `PendingBlocks` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -99,7 +102,7 @@ CREATE TABLE `pool_meta` (
 
 CREATE TABLE `pool_daily` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `TimeStamp` datetime DEFAULT NULL,
+  `Day` datetime DEFAULT NULL,
   `PoolID` int(11) DEFAULT NULL,
   `AvgDifficulty` bigint(20) DEFAULT NULL,
   `AvgLuck` bigint(20) DEFAULT NULL,
