@@ -37,7 +37,8 @@
         echo getTimeStamp()." Polling ".$sPoolName."\n";
 
         // Get Main Stats
-        $aStats  = getJsonData($sPoolAPI."/stats");
+        $aStats     = getJsonData($sPoolAPI."/stats");
+        $iTimeStamp = time();
         if($aStats === false) {
             echo getTimeStamp()." Could not connect to API\n";
             return;
@@ -102,6 +103,7 @@
                 }
 
                 $SQL  = "INSERT INTO pool_blocks (";
+                $SQL .= "TimeStamp, ";
                 $SQL .= "PoolID, ";
                 $SQL .= "Height, ";
                 $SQL .= "Hash, ";
@@ -111,6 +113,7 @@
                 $SQL .= "Reward, ";
                 $SQL .= "Orphaned";
                 $SQL .= ") VALUES (";
+                $SQL .= "'".date("Y-m-d-H-i-s",$iTimeStamp)."', ";
                 $SQL .= "'".$iPoolID."',";
                 $SQL .= "'".$sHeight."',";
                 $SQL .= "'".$sHash."',";
@@ -131,15 +134,15 @@
         $iMiners = intval($aStats["pool"]["miners"]);
 
         $SQL  = "INSERT INTO pool_meta (";
-        $SQL .= "PoolID, ";
         $SQL .= "TimeStamp, ";
+        $SQL .= "PoolID, ";
         $SQL .= "HashRate, ";
         $SQL .= "Miners,";
         $SQL .= "NewBlocks,";
         $SQL .= "PendingBlocks";
         $SQL .= ") VALUES (";
+        $SQL .= "'".date("Y-m-d-H-i-s",$iTimeStamp)."', ";
         $SQL .= "'".$iPoolID."', ";
-        $SQL .= "'".date("Y-m-d-H-i-s",time())."', ";
         $SQL .= "'".$dRate."', ";
         $SQL .= "'".$iMiners."',";
         $SQL .= "'".$nNew."',";
@@ -168,10 +171,12 @@
             // Get Stats
             echo getTimeStamp()." Getting stats for wallet ".$aWallet["Name"]." on ".$sPoolName."\n";
             $aMining    = getJsonData($sPoolAPI."/stats_address?longpool=false&address=".$aWallet["Address"]);
+            $iTimeStamp = time();
             if($aMining === false) {
                 echo getTimeStamp()." Could not connect to API\n";
                 return;
             }
+
             $iHashes    = intval(array_key_exists("hashes",$aMining["stats"]) ? $aMining["stats"]["hashes"] : 0);
             $iLastShare = intval(array_key_exists("lastShare",$aMining["stats"]) ? $aMining["stats"]["lastShare"] : 0);
             $sLastShare = date("Y-m-d-H-i-s",$iLastShare);
@@ -202,7 +207,7 @@
             }
 
             $SQL  = "INSERT INTO mining (TimeStamp,WalletID,PoolID,Hashes,LastShare,Balance,HashRate) VALUES (";
-            $SQL .= "'".date("Y-m-d-H-i-s",time())."',";
+            $SQL .= "'".date("Y-m-d-H-i-s",$iTimeStamp)."',";
             $SQL .= "'".$aWallet["ID"]."',";
             $SQL .= "'".$iPoolID."',";
             $SQL .= "'".$iHashes."',";

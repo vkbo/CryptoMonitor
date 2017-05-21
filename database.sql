@@ -73,6 +73,7 @@ CREATE TABLE `pools` (
 
 CREATE TABLE `pool_blocks` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `TimeStamp` datetime DEFAULT NULL,
   `PoolID` int(11) DEFAULT NULL,
   `Height` int(11) DEFAULT NULL,
   `Hash` varchar(64) DEFAULT NULL,
