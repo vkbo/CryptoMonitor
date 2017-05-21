@@ -70,8 +70,8 @@
             $iLastBlock = 0;
         }
 
-        $nNew    = 0;
-        $nBlocks = floor(count($aStats["pool"]["blocks"])/2);
+        $nNew     = 0;
+        $nBlocks  = floor(count($aStats["pool"]["blocks"])/2);
 
         for($i=0; $i<$nBlocks; $i++) {
             $sBlocks = $aStats["pool"]["blocks"][$i*2];
@@ -80,14 +80,21 @@
             if(intval($sHeight) > $iLastBlock) {
 
                 $aBlocks = explode(":",$sBlocks);
-                if(count($aBlocks) < 6) continue;
-                if(intval($aBlocks[4]) != 0) continue;
+                $nBits   = count($aBlocks);
+
+                // If there is less then 6 elements, this is a pending block in the default API
+                if($nBits < 6) continue;
 
                 $sHash = $aBlocks[0];
                 $sTime = date("Y-m-d-H-i-s",intval($aBlocks[1]));
                 $iDiff = intval($aBlocks[2]);
                 $iLuck = intval($aBlocks[3]);
+                $iOrph = intval($aBlocks[4]);
                 $iPaid = intval($aBlocks[5]);
+
+                // This is crypto-pool.fr who uses 6 elements for pending and 10 for non-pending
+                // blocks. For pending blocks a different value is stored in element 4.
+                if($iOrph > 1 && $nBits == 6) continue;
 
                 $SQL  = "INSERT INTO pool_blocks (";
                 $SQL .= "PoolID, ";
@@ -97,7 +104,7 @@
                 $SQL .= "FoundTime, ";
                 $SQL .= "Luck, ";
                 $SQL .= "Reward, ";
-                $SQL .= "Share";
+                $SQL .= "Orphaned";
                 $SQL .= ") VALUES (";
                 $SQL .= "'".$iPoolID."',";
                 $SQL .= "'".$sHeight."',";
@@ -106,7 +113,7 @@
                 $SQL .= "'".$sTime."',";
                 $SQL .= "'".$iLuck."',";
                 $SQL .= "'".$iPaid."',";
-                $SQL .= "'0')";
+                $SQL .= "'".$iOrph."')";
                 if($bSave) $oDB->query($SQL);
 
                 $nNew++;

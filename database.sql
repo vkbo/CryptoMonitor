@@ -8,7 +8,7 @@ CREATE TABLE `currency` (
   `DisplayName` varchar(45) DEFAULT NULL,
   `DisplayUnit` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Mining Table
 
@@ -23,7 +23,7 @@ CREATE TABLE `mining` (
   `HashRate` double DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `MainIDX` (`TimeStamp`,`WalletID`,`PoolID`)
-) ENGINE=InnoDB AUTO_INCREMENT=541 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Mining Hourly Stats Table
 
@@ -38,7 +38,7 @@ CREATE TABLE `mining_hourly` (
   `Entries` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `MainIDX` (`TimeStamp`,`WalletID`,`PoolID`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Mining Daily Stats Table
 
@@ -66,7 +66,7 @@ CREATE TABLE `pools` (
   `CurrencyID` int(11) DEFAULT NULL,
   `Active` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Pool Blocks Table
 
@@ -79,10 +79,10 @@ CREATE TABLE `pool_blocks` (
   `FoundTime` datetime DEFAULT NULL,
   `Luck` bigint(20) DEFAULT NULL,
   `Reward` bigint(20) DEFAULT NULL,
-  `Share` bigint(20) DEFAULT NULL,
+  `Orphaned` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `LookupIDX` (`Height`,`PoolID`)
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Pool Meta Data Table
 
@@ -93,7 +93,7 @@ CREATE TABLE `pool_meta` (
   `HashRate` double DEFAULT NULL,
   `Miners` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=543 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Pool Daily Stats Table
 
@@ -106,6 +106,7 @@ CREATE TABLE `pool_daily` (
   `AvgReward` bigint(20) DEFAULT NULL,
   `SumReward` bigint(20) DEFAULT NULL,
   `Blocks` int(11) DEFAULT NULL,
+  `Orphaned` int(11) DEFAULT NULL,
   `HashRate` double DEFAULT NULL,
   `Miners` int(11) DEFAULT NULL,
   `MetaEntries` int(11) DEFAULT NULL,
@@ -121,7 +122,7 @@ CREATE TABLE `wallets` (
   `Address` varchar(100) DEFAULT NULL,
   `CurrencyID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 # Pool to Wallet Links Table
 

@@ -107,6 +107,7 @@
             echo getTimeStamp()." Averaging for ".date("Y-m-d",$iStart)."\n";
             $SQL  = "SELECT ";
             $SQL .= "COUNT(ID) AS Count, ";
+            $SQL .= "SUM(Orphaned) AS Orphaned, ";
             $SQL .= "ROUND(AVG(Difficulty)) AS AvgDifficulty, ";
             $SQL .= "ROUND(AVG(Luck)) AS AvgLuck, ";
             $SQL .= "ROUND(AVG(Reward)) AS AvgReward, ";
@@ -134,7 +135,7 @@
                 $aBlocks = $oBlocks->fetch_assoc();
                 $SQL  = "INSERT INTO pool_daily (";
                 $SQL .= "TimeStamp, PoolID, AvgDifficulty, AvgLuck, AvgReward, ";
-                $SQL .= "SumReward, Blocks, HashRate, Miners, MetaEntries";
+                $SQL .= "SumReward, Blocks, Orphaned, HashRate, Miners, MetaEntries";
                 $SQL .= ") VALUES (";
                 $SQL .= "'".date("Y-m-d-H-i-s",$iStart)."',";
                 $SQL .= "'".$iPoolID."',";
@@ -143,6 +144,7 @@
                 $SQL .= "'".$aBlocks["AvgReward"]."',";
                 $SQL .= "'".$aBlocks["SumReward"]."',";
                 $SQL .= "'".$aBlocks["Count"]."',";
+                $SQL .= "'".$aBlocks["Orphaned"]."',";
                 if($oMeta->num_rows > 0) {
                     $aMeta = $oMeta->fetch_assoc();
                     $SQL .= "'".$aMeta["HashRate"]."',";
