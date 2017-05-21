@@ -53,6 +53,7 @@
     <link rel="stylesheet" href="css/normalize.css" type="text/css" media="all">
     <link rel="stylesheet" href="css/styles.css" type="text/css" media="all">
     <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 </head>
 
 <body>
@@ -101,7 +102,7 @@
             echo "<div><b>Last Contacted:</b> ".date("Y-m-d H:i:s",strtotime($aPool["MetaTimeStamp"]))."</div>\n";
             echo "<div><b>Activity:</b> ".rdblBigNum($aPool["MetaHashRate"],2,"H/s").", ";
                 echo $aPool["MetaMiners"]." miners</div>\n";
-            echo "<div><b>Blocks (24 hours):</b> ".$aPool["BlockCount"]." found, ";
+            echo "<div><b>Blocks (24h):</b> ".$aPool["BlockCount"]." found, ";
                 echo $aPool["BlockOrphaned"]." orphaned, ".$aPool["MetaPending"]." pending</div>\n";
 
             $SQL  = "SELECT ";
