@@ -176,6 +176,10 @@
                 echo getTimeStamp()." Could not connect to API\n";
                 return;
             }
+            if(array_key_exists("error",$aMining)) {
+                echo getTimeStamp()." Wallet not found\n";
+                return;
+            }
 
             $iHashes    = intval(array_key_exists("hashes",$aMining["stats"]) ? $aMining["stats"]["hashes"] : 0);
             $iLastShare = intval(array_key_exists("lastShare",$aMining["stats"]) ? $aMining["stats"]["lastShare"] : 0);

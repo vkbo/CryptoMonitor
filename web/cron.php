@@ -17,7 +17,7 @@
     $bSave   = true;
     $sDaily  = "00:00";
     $sHourly = "00";
-    $aPoll   = array("00","05","10","15","20","25","30","35","40","45","50","55");
+    $aPoll   = array("05","15","25","35","45","55");
     // END Cron Settings
 
     $sHour = date("H:i",time());
@@ -25,8 +25,8 @@
 
     if(!$bSave) {
         echo getTimeStamp()." Running in test mode\n";
-        $sHour = "00:00";
-        $sMin  = "00";
+        $sHour = "00:05";
+        $sMin  = "05";
     }
 
     $oDB    = new mysqli($cDBHost,$cDBUser,$cDBPass,$cDBMain);
