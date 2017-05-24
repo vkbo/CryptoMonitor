@@ -73,8 +73,12 @@
         $SQL .= "pm.HashRate AS MetaHashRate, ";
         $SQL .= "pm.Miners AS MetaMiners, ";
         $SQL .= "pm.PendingBlocks AS MetaPending, ";
-        $SQL .= "pb.BlockCount AS BlockCount, ";
-        $SQL .= "pb.BlockOrphaned AS BlockOrphaned ";
+        $SQL .= "pm.LastBlock AS MetaLastBlock, ";
+        $SQL .= "pb.BlockCount + pm.PendingBlocks AS BlockCount, ";
+        $SQL .= "pb.BlockOrphaned AS BlockOrphaned, ";
+        $SQL .= "pb.BlockLuck AS BlockLuck, ";
+        $SQL .= "pb.BlockReward AS BlockReward, ";
+        $SQL .= "pb.BlockDiff AS BlockDiff ";
         $SQL .= "FROM cryptomonitor.pools AS p ";
         $SQL .= "JOIN cryptomonitor.currency AS c ON c.ID = p.CurrencyID ";
         $SQL .= "JOIN (";
@@ -87,7 +91,10 @@
         $SQL .= "JOIN (";
         $SQL .=     "SELECT PoolID, ";
         $SQL .=     "COUNT(ID) AS BlockCount, ";
-        $SQL .=     "SUM(Orphaned) AS BlockOrphaned ";
+        $SQL .=     "SUM(Orphaned) AS BlockOrphaned, ";
+        $SQL .=     "AVG(Luck) AS BlockLuck, ";
+        $SQL .=     "AVG(Reward) AS BlockReward, ";
+        $SQL .=     "AVG(Difficulty) AS BlockDiff ";
         $SQL .=     "FROM pool_blocks ";
         $SQL .=     "WHERE FoundTime > '".date("Y-m-d-H-i-s",time()-86400)."' ";
         $SQL .=     "GROUP BY PoolID";
@@ -96,14 +103,33 @@
         $oPools = $oDB->query($SQL);
 
         while($aPool = $oPools->fetch_assoc()) {
-            echo "<h2 class='pool-header'>".$aPool["PoolName"]."</h2>\n";
-            echo "<div class='pool-url'><a href='".$aPool["PoolURL"]."'>".$aPool["PoolURL"]."</a></div>\n";
-            echo "<div class='pool-currency'>".$aPool["CurrName"]." [".$aPool["CurrISO"]."]</div><br>\n";
-            echo "<div><b>Last Contacted:</b> ".date("Y-m-d H:i:s",strtotime($aPool["MetaTimeStamp"]))."</div>\n";
+
+            $iTimeStamp = strtotime($aPool["MetaTimeStamp"]);
+            $dLuck      = floatval($aPool["BlockLuck"]);
+            $dDiff      = floatval($aPool["BlockDiff"]);
+            $dReward    = floatval($aPool["BlockReward"]);
+            $iLastBlock = strtotime($aPool["MetaLastBlock"]);
+
+            if($dDiff > $dLuck) {
+                $dLuckP = 100*($dDiff-$dLuck)/$dDiff;
+            } else {
+                $dLuckP = 100*($dDiff-$dLuck)/$dLuck;
+            }
+            $dCoinRate = $dLuck/$dReward*intval($aPool["CurrUnit"]);
+
+            echo "<div class='pool-stats'>\n";
+            echo "<h2><a href='".$aPool["PoolURL"]."'>".$aPool["PoolName"]."</a></h2>\n";
+            echo "<div><b>Last Seen:</b> ".date("Y-m-d H:i:s",$iTimeStamp)."</div>\n";
             echo "<div><b>Activity:</b> ".rdblBigNum($aPool["MetaHashRate"],2,"H/s").", ";
                 echo $aPool["MetaMiners"]." miners</div>\n";
             echo "<div><b>Blocks (24h):</b> ".$aPool["BlockCount"]." found, ";
-                echo $aPool["BlockOrphaned"]." orphaned, ".$aPool["MetaPending"]." pending</div>\n";
+                echo $aPool["BlockOrphaned"]." orphaned</div>\n";
+            // echo "<div><b>Last Block:</b> ".rdblSeconds($iTimeStamp-$iLastBlock).", ";
+            echo "<div><b>Last Block:</b> ".date("D H:i",$iLastBlock).", ";
+                echo $aPool["MetaPending"]." pending</div>\n";
+            echo "<div><b>Luck (24h):</b> ".rdblNum($dLuckP,1,"%");
+                echo " (".rdblBigNum($dCoinRate,2,"H")."/".$aPool["CurrISO"].")</div>";
+            // echo "<div><b>Diff:</b> ".$dDiff."</div>";
 
             $SQL  = "SELECT ";
             $SQL .= "pw.PoolID AS PoolID, ";
@@ -128,13 +154,18 @@
             $oWallets = $oDB->query($SQL);
 
             while($aWallet = $oWallets->fetch_assoc()) {
-                $sBalance = number_format(
-                    intval($aWallet["Balance"])/intval($aPool["CurrDispUnit"]),2,"."," ");
+                $iHashes   = intval($aWallet["Hashes"]);
+                $dHashRate = floatval($aWallet["HashRate"]);
+                $iBalance  = intval($aWallet["Balance"])/intval($aPool["CurrDispUnit"]);
+                $dCoinRate = $iHashes/intval($aWallet["Balance"])*intval($aPool["CurrUnit"]);
+
                 echo "<h3>".$aWallet["WalletName"]." wallet</h3>\n";
-                echo "<div><b>Hashes:</b> ".rdblBigNum($aWallet["Hashes"],2,"H")."</div>\n";
-                echo "<div><b>HashRate:</b> ".rdblBigNum($aWallet["HashRate"],2,"H/s")."</div>\n";
-                echo "<div><b>Balance:</b> ".$sBalance." ".$aPool["CurrDispName"]."</div>\n";
+                echo "<div><b>Hashes:</b> ".rdblBigNum($iHashes,2,"H");
+                    echo " (".rdblBigNum($dCoinRate,2,"H")."/".$aPool["CurrISO"].")</div>\n";
+                echo "<div><b>HashRate:</b> ".rdblBigNum($dHashRate,2,"H/s")."</div>\n";
+                echo "<div><b>Balance:</b> ".rdblNum($iBalance,2,$aPool["CurrDispName"])."</div>";
             }
+            echo "</div>\n";
         }
 
     ?>

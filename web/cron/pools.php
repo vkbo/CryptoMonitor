@@ -130,8 +130,9 @@
         echo getTimeStamp()." ".$nNew." new block".($nNew!=1?"s":"").", ".$nPending." pending\n";
 
         // Pool Meta
-        $dRate   = floatval($aStats["pool"]["hashrate"]);
-        $iMiners = intval($aStats["pool"]["miners"]);
+        $dRate      = floatval($aStats["pool"]["hashrate"]);
+        $iMiners    = intval($aStats["pool"]["miners"]);
+        $iLastBlock = floor(intval($aStats["pool"]["stats"]["lastBlockFound"])/1000);
 
         $SQL  = "INSERT INTO pool_meta (";
         $SQL .= "TimeStamp, ";
@@ -139,14 +140,16 @@
         $SQL .= "HashRate, ";
         $SQL .= "Miners,";
         $SQL .= "NewBlocks,";
-        $SQL .= "PendingBlocks";
+        $SQL .= "PendingBlocks,";
+        $SQL .= "LastBlock";
         $SQL .= ") VALUES (";
         $SQL .= "'".date("Y-m-d-H-i-s",$iTimeStamp)."', ";
         $SQL .= "'".$iPoolID."', ";
         $SQL .= "'".$dRate."', ";
         $SQL .= "'".$iMiners."',";
         $SQL .= "'".$nNew."',";
-        $SQL .= "'".$nPending."')";
+        $SQL .= "'".$nPending."',";
+        $SQL .= "'".date("Y-m-d-H-i-s",$iLastBlock)."')";
         if($bSave) $oDB->query($SQL);
 
         // Wallet Stats
