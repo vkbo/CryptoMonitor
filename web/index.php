@@ -71,15 +71,15 @@
     $SQL .= "pb.BlockLuck AS BlockLuck, ";
     $SQL .= "pb.BlockReward AS BlockReward, ";
     $SQL .= "pb.BlockDiff AS BlockDiff ";
-    $SQL .= "FROM cryptomonitor.pools AS p ";
-    $SQL .= "JOIN cryptomonitor.currency AS c ON c.ID = p.CurrencyID ";
+    $SQL .= "FROM pools AS p ";
+    $SQL .= "JOIN currency AS c ON c.ID = p.CurrencyID ";
     $SQL .= "JOIN (";
     $SQL .=     "SELECT PoolID, ";
     $SQL .=     "MAX(TimeStamp) AS LatestMeta ";
-    $SQL .=     "FROM cryptomonitor.pool_meta ";
+    $SQL .=     "FROM pool_meta ";
     $SQL .=     "GROUP BY PoolID";
     $SQL .= ") AS t1 ON t1.PoolID = p.ID ";
-    $SQL .= "JOIN cryptomonitor.pool_meta AS pm ON pm.TimeStamp = t1.LatestMeta AND pm.PoolID = p.ID ";
+    $SQL .= "JOIN pool_meta AS pm ON pm.TimeStamp = t1.LatestMeta AND pm.PoolID = p.ID ";
     $SQL .= "JOIN (";
     $SQL .=     "SELECT PoolID, ";
     $SQL .=     "COUNT(ID) AS BlockCount, ";
@@ -111,7 +111,7 @@
         $dCoinRate = $dLuck/$dReward*intval($aPool["CurrUnit"]);
 
         echo "<div class='pool-stats'>\n";
-        echo "<h2><a href='".$aPool["PoolURL"]."'>".$aPool["PoolName"]."</a></h2>\n";
+        echo "<h2><a href='".$aPool["PoolURL"]."' target='_blank'>".$aPool["PoolName"]."</a></h2>\n";
         echo "<div><b>Last Seen:</b> ".date("Y-m-d H:i:s",$iTimeStamp)."</div>\n";
         echo "<div><b>Activity:</b> ".rdblBigNum($aPool["MetaHashRate"],2,"H/s").", ";
             echo $aPool["MetaMiners"]." miners</div>\n";
@@ -132,8 +132,8 @@
         $SQL .= "m.LastShare AS LastShare, ";
         $SQL .= "m.Balance AS Balance, ";
         $SQL .= "m.HashRate AS HashRate ";
-        $SQL .= "FROM cryptomonitor.pool_wallet AS pw ";
-        $SQL .= "JOIN cryptomonitor.wallets AS w ON w.ID = pw.WalletID ";
+        $SQL .= "FROM pool_wallet AS pw ";
+        $SQL .= "JOIN wallets AS w ON w.ID = pw.WalletID ";
         $SQL .= "JOIN (";
         $SQL .=     "SELECT WalletID, PoolID,";
         $SQL .=     "MAX(TimeStamp) AS LatestMining ";
@@ -163,6 +163,77 @@
     }
 
     echo "<br>\n";
+
+    $SQL  = "SELECT ";
+    $SQL .= "pb.TimeStamp AS TimeStamp, ";
+    $SQL .= "pb.Height AS Height, ";
+    $SQL .= "pb.Difficulty AS Difficulty, ";
+    $SQL .= "pb.FoundTime AS FoundTime, ";
+    $SQL .= "pb.Luck AS Luck, ";
+    $SQL .= "pb.Reward AS Reward, ";
+    $SQL .= "pb.Orphaned AS Orphaned, ";
+    $SQL .= "p.Name AS PoolName, ";
+    $SQL .= "p.ID AS PoolID ";
+    $SQL .= "FROM pool_blocks AS pb ";
+    $SQL .= "JOIN pools AS p ON pb.PoolID = p.ID ";
+    $SQL .= "ORDER BY pb.Height DESC ";
+    $SQL .= "LIMIT 0,50";
+    $oBlocks = $oDB->query($SQL);
+
+    echo "<h2>Blocks</h2>\n";
+    echo "<div class='table-wrap'>\n";
+    echo "<table class='blocks-list'>\n";
+    echo "<thead>\n";
+        echo "<tr>";
+        echo "<td>Height</td>";
+        echo "<td>Pool</td>";
+        echo "<td>Found</td>";
+        echo "<td>Diff</td>";
+        echo "<td>Luck</td>";
+        echo "<td>Coin</td>";
+        echo "</tr>\n";
+    echo "</thead>\n";
+
+    echo "<tbody>\n";
+    while($aBlock = $oBlocks->fetch_assoc()) {
+
+        $iLuck   = intval($aBlock["Luck"]);
+        $iDiff   = intval($aBlock["Difficulty"]);
+        $dReward = intval($aBlock["Reward"])/1e12;
+
+        if($iDiff > $iLuck) {
+            $dLuck = 100*($iDiff-$iLuck)/$iDiff;
+            $sLuck = "green";
+        } else {
+            $dLuck = 100*($iDiff-$iLuck)/$iLuck;
+            $sLuck = "red";
+        }
+
+        $aLegend[$aBlock["PoolID"]] = $aBlock["PoolName"];
+
+        echo "<tr class='".($aBlock["Orphaned"]==1?"block-orph":"block-ok")."'>\n";
+        echo "<td>".$aBlock["Height"]."</td>\n";
+        echo "<td>";
+            echo "<span class='twide'>".$aBlock["PoolName"]."</span>";
+            echo "<span class='tnarr' style='display: table; margin: 0 auto;'><div class='legend l".($aBlock["PoolID"]%6-1)."'></div></span>";
+        echo "</td>\n";
+        echo "<td>";
+            echo "<span class='twide'>".date("Y-m-d H:i:s",strtotime($aBlock["FoundTime"]))."</span>";
+            echo "<span class='tnarr'>".date("D H:i",strtotime($aBlock["FoundTime"]))."</span>";
+        echo "</td>\n";
+        echo "<td class='right'>".rdblBigNum($aBlock["Difficulty"],2)."</td>\n";
+        echo "<td class='right ".$sLuck."'>".rdblNum($dLuck,1,"%")."</td>\n";
+        echo "<td class='right'>".rdblNum($dReward,2,"")."<span class='twide'> XMR</span></td>\n";
+        echo "</tr>\n";
+    }
+    echo "</tbody>\n";
+    echo "</table>\n";
+    echo "<div class='tnarr'>\n";
+    foreach($aLegend as $iID=>$sPoolName) {
+        echo "<div><div class='legend l".($iID-1)."'></div> ".$sPoolName."</div>\n";
+    }
+    echo "</div>\n";
+    echo "</div>\n";
 
     require_once("includes/footer.php");
 ?>

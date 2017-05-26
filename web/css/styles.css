@@ -4,9 +4,15 @@
  *  Created 2017-05-19
  */
 
+html {
+    background-color: #ffffff;
+}
+
 body {
     padding: 40px;
     font-size: 15px;
+    max-width: 900px;
+    background-color: #f7f7f7;
 }
 
 h1 {font-size: 2.00em; margin: 0em 0em 0.4em 0em;}
@@ -49,7 +55,7 @@ a:hover {color: #00aa00; text-decoration: underline;}
 }
 
 #main-menu ul li:hover {
-    background-color: #dddddd;
+    background-color: #e0f0e0;
 }
 
 /**
@@ -60,7 +66,7 @@ a:hover {color: #00aa00; text-decoration: underline;}
     max-width: 400px;
     /*border: 1px solid #999999;*/
     display: inline-block;
-    margin: 0 20px 20px 0;
+    margin: 0 40px 20px 0;
 }
 
 .pool-stats h2 {
@@ -75,6 +81,94 @@ a:hover {color: #00aa00; text-decoration: underline;}
     display: inline-block;
 }
 
+/**
+ *  Blocks
+ */
+
+.table-wrap {
+    overflow-x: scroll;
+}
+
+.blocks-list {
+    margin-bottom: 8px;
+}
+
+.blocks-list thead td {
+    font-weight: bold;
+    padding: 2px 6px;
+    border: 1px solid #000000;
+    background-color: #cccccc;
+    white-space: nowrap;
+}
+
+.blocks-list tbody td {
+    padding: 2px 6px;
+    border: 1px solid #000000;
+    white-space: nowrap;
+}
+
+.blocks-list tfoot td {
+    padding: 2px 6px;
+    white-space: nowrap;
+}
+
+.blocks-list .block-orph {
+    background-color: #ffeeee;
+}
+
+.blocks-list .block-ok {
+    background-color: #eeffee;
+}
+
+.values {
+    font-family: 'Source Code Pro', monospace;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.noborder {
+    border: 0;
+}
+
+.green {
+    color: #008800;
+}
+
+.red {
+    color: #880000;
+}
+
+/**
+ *  Legends
+ */
+
+.legend {
+    width: 10px;
+    height: 10px;
+    font-size: 0;
+    border: 1px solid #000000;
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.l0 {background-color: #0000aa;}
+.l1 {background-color: #00aa00;}
+.l2 {background-color: #aa0000;}
+.l3 {background-color: #aa0000;}
+.l4 {background-color: #aa0000;}
+.l5 {background-color: #aa0000;}
+
+/* Other */
 
 .plot {
     width: 1000px;
@@ -91,29 +185,41 @@ a:hover {color: #00aa00; text-decoration: underline;}
     padding: 4px;
 }
 
-.values {
-    font-family: 'Source Code Pro', monospace;
+/**
+ *  Responsive
+ */
+
+/* Defaults */
+
+.tnarr {
+    display: none;
 }
 
-.left {
-    text-align: left;
-}
-
-.right {
-    text-align: right;
-}
-
-.green {
-    color: #009900;
-}
-
-.red {
-    color: #990000;
-}
+/* Mobile */
 
 @media screen and (max-width: 500px) {
 
     body {
         padding: 4% 2%;
+    }
+
+    .table-wrap {
+        width: inherit;
+    }
+
+    .blocks-list thead td {
+        padding: 2px 4px;
+    }
+
+    .blocks-list tbody td {
+        padding: 2px 4px;
+    }
+
+    .tnarr {
+        display: inherit;
+    }
+
+    .twide {
+        display: none;
     }
 }

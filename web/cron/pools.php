@@ -82,7 +82,7 @@
                         }
                         break;
                     default:
-                        if($nBits != 6) {
+                        if($nBits < 5) {
                             $nPending++;
                             $bPending = true;
                         }
@@ -95,7 +95,7 @@
                 $iDiff = intval($aBlocks[2]);
                 $iLuck = intval($aBlocks[3]);
                 $iOrph = intval($aBlocks[4]);
-                $iPaid = intval($aBlocks[5]);
+                $iPaid = ($nBits>5 ? intval($aBlocks[5]) : 0);
 
                 if($iOrph > 1) {
                     echo getTimeStamp()." Unknown block status for block ".$sHeight."\n";
