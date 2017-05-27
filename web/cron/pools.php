@@ -12,7 +12,7 @@
 
         $webOpts    = array("http" => array("header" => "User-Agent: Mozilla/5.0"));
         $webContext = stream_context_create($webOpts);
-        $jsonData   = file_get_contents($sAPI,false,$webContext);
+        $jsonData   = @file_get_contents($sAPI,false,$webContext);
 
         if($jsonData === false) {
             return false;
@@ -39,7 +39,7 @@
         // Get Main Stats
         $aStats     = getJsonData($sPoolAPI."/stats");
         $iTimeStamp = time();
-        if($aStats === false) {
+        if($aStats == NULL) {
             echo getTimeStamp()." Could not connect to API\n";
             return;
         }
@@ -175,7 +175,7 @@
             echo getTimeStamp()." Getting stats for wallet ".$aWallet["Name"]." on ".$sPoolName."\n";
             $aMining    = getJsonData($sPoolAPI."/stats_address?longpool=false&address=".$aWallet["Address"]);
             $iTimeStamp = time();
-            if($aMining === false) {
+            if($aMining == NULL) {
                 echo getTimeStamp()." Could not connect to API\n";
                 return;
             }

@@ -110,7 +110,15 @@
         }
         $dCoinRate = $dLuck/$dReward*intval($aPool["CurrUnit"]);
 
-        echo "<div class='pool-stats'>\n";
+        if(time()-$iTimeStamp > 1820) {
+            $sTimeCol = "red";
+        } elseif(time()-$iTimeStamp > 620) {
+            $sTimeCol = "orange";
+        } else {
+            $sTimeCol = "";
+        }
+
+        echo "<div class='pool-stats ".$sTimeCol."'>\n";
         echo "<h2><a href='".$aPool["PoolURL"]."' target='_blank'>".$aPool["PoolName"]."</a></h2>\n";
         echo "<div><b>Last Seen:</b> ".date("Y-m-d H:i:s",$iTimeStamp)."</div>\n";
         echo "<div><b>Activity:</b> ".rdblBigNum($aPool["MetaHashRate"],2,"H/s").", ";
@@ -215,7 +223,7 @@
         echo "<td>".$aBlock["Height"]."</td>\n";
         echo "<td>";
             echo "<span class='twide'>".$aBlock["PoolName"]."</span>";
-            echo "<span class='tnarr' style='display: table; margin: 0 auto;'><div class='legend l".($aBlock["PoolID"]%6-1)."'></div></span>";
+            echo "<span class='tnarr' style='display: table; margin: 0 auto;'><div class='tnarr legend l".($aBlock["PoolID"]%6-1)."'></div></span>";
         echo "</td>\n";
         echo "<td>";
             echo "<span class='twide'>".date("Y-m-d H:i:s",strtotime($aBlock["FoundTime"]))."</span>";

@@ -86,7 +86,7 @@ a:hover {color: #00aa00; text-decoration: underline;}
  */
 
 .table-wrap {
-    overflow-x: scroll;
+    /*overflow-x: scroll;*/
 }
 
 .blocks-list {
@@ -140,13 +140,9 @@ a:hover {color: #00aa00; text-decoration: underline;}
     border: 0;
 }
 
-.green {
-    color: #008800;
-}
-
-.red {
-    color: #880000;
-}
+.green  {color: #008800;}
+.red    {color: #880000;}
+.orange {color: #aa6600;}
 
 /**
  *  Legends
