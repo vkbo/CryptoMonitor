@@ -86,6 +86,21 @@ CREATE TABLE `pool_blocks` (
   KEY `LookupIDX` (`Height`,`PoolID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+¤ Pool Payments Table
+
+CREATE TABLE `pool_payments` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `TimeStamp` datetime DEFAULT NULL,
+  `PoolID` int(11) DEFAULT NULL,
+  `WalletID` int(11) DEFAULT NULL,
+  `TransactionTime` datetime DEFAULT NULL,
+  `TransactionHash` varchar(64) DEFAULT NULL,
+  `Amount` bigint(20) DEFAULT NULL,
+  `Mixin` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `Hash` (`TransactionHash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 # Pool Meta Data Table
 
 CREATE TABLE `pool_meta` (

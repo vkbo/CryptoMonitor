@@ -92,7 +92,7 @@
     $SQL .=     "GROUP BY PoolID";
     $SQL .= ") AS pb ON pb.PoolID = p.ID ";
     $SQL .= "WHERE p.Active = 1 ";
-    $SQL .= "ORDER BY pm.TimeStamp DESC";
+    $SQL .= "ORDER BY pm.TimeStamp DESC, pm.ID DESC";
     $oPools = $oDB->query($SQL);
 
     while($aPool = $oPools->fetch_assoc()) {
@@ -123,14 +123,14 @@
         echo "<div><b>Last Seen:</b> ".date("Y-m-d H:i:s",$iTimeStamp)."</div>\n";
         echo "<div><b>Activity:</b> ".rdblBigNum($aPool["MetaHashRate"],2,"H/s").", ";
             echo $aPool["MetaMiners"]." miners</div>\n";
+        echo "<div><b>Last Block:</b> ".date("D H:i",$iLastBlock).", ";
+            echo $aPool["MetaPending"]." pending</div>\n";
         echo "<div><b>Blocks (24h):</b> ".$aPool["BlockCount"]." found, ";
             echo $aPool["BlockOrphaned"]." orphaned</div>\n";
         // echo "<div><b>Last Block:</b> ".rdblSeconds($iTimeStamp-$iLastBlock).", ";
-        echo "<div><b>Last Block:</b> ".date("D H:i",$iLastBlock).", ";
-            echo $aPool["MetaPending"]." pending</div>\n";
         echo "<div><b>Luck (24h):</b> ".rdblNum($dLuckP,1,"%");
             echo " (".rdblBigNum($dCoinRate,2,"H")."/".$aPool["CurrISO"].")</div>";
-        echo "<div><b>Difficulty:</b> ".rdblBigNum($dDiff,2);
+        echo "<div><b>Diff (24h):</b> ".rdblBigNum($dDiff,2);
             echo " (".rdblBigNum($dDiff/120,2,"H/s").")</div>";
 
         $SQL  = "SELECT ";
@@ -139,9 +139,11 @@
         $SQL .= "m.Hashes AS Hashes, ";
         $SQL .= "m.LastShare AS LastShare, ";
         $SQL .= "m.Balance AS Balance, ";
-        $SQL .= "m.HashRate AS HashRate ";
+        $SQL .= "m.HashRate AS HashRate, ";
+        $SQL .= "IF(SUM(pp.Amount) IS NULL, 0, SUM(pp.Amount)) AS Payments ";
         $SQL .= "FROM pool_wallet AS pw ";
         $SQL .= "JOIN wallets AS w ON w.ID = pw.WalletID ";
+        $SQL .= "LEFT JOIN pool_payments AS pp ON pp.PoolID = pw.PoolID AND pp.WalletID = pw.WalletID ";
         $SQL .= "JOIN (";
         $SQL .=     "SELECT WalletID, PoolID,";
         $SQL .=     "MAX(TimeStamp) AS LatestMining ";
@@ -159,13 +161,15 @@
             $iHashes   = intval($aWallet["Hashes"]);
             $dHashRate = floatval($aWallet["HashRate"]);
             $iBalance  = intval($aWallet["Balance"])/intval($aPool["CurrDispUnit"]);
-            $dCoinRate = $iHashes/intval($aWallet["Balance"])*intval($aPool["CurrUnit"]);
+            $iPayments = intval($aWallet["Payments"])/intval($aPool["CurrDispUnit"]);
+            $dCoinRate = $iHashes/($iBalance+$iPayments)*intval($aPool["CurrUnit"]);
 
-            echo "<h3>".$aWallet["WalletName"]." wallet</h3>\n";
+            echo "<h3>".$aWallet["WalletName"]." Wallet</h3>\n";
             echo "<div><b>Hashes:</b> ".rdblBigNum($iHashes,2,"H");
                 echo " (".rdblBigNum($dCoinRate,2,"H")."/".$aPool["CurrISO"].")</div>\n";
             echo "<div><b>HashRate:</b> ".rdblBigNum($dHashRate,2,"H/s")."</div>\n";
             echo "<div><b>Balance:</b> ".rdblNum($iBalance,2,$aPool["CurrDispName"])."</div>";
+            echo "<div><b>Payments:</b> ".rdblNum($iPayments,2,$aPool["CurrDispName"])."</div>";
         }
         echo "</div>\n";
     }
@@ -177,6 +181,7 @@
     $SQL .= "pb.Height AS Height, ";
     $SQL .= "pb.Difficulty AS Difficulty, ";
     $SQL .= "pb.FoundTime AS FoundTime, ";
+    $SQL .= "pb.Hash AS Hash, ";
     $SQL .= "pb.Luck AS Luck, ";
     $SQL .= "pb.Reward AS Reward, ";
     $SQL .= "pb.Orphaned AS Orphaned, ";
@@ -195,6 +200,7 @@
         echo "<tr>";
         echo "<td>Height</td>";
         echo "<td>Pool</td>";
+        // echo "<td class='twide'>Hash</td>";
         echo "<td>Found</td>";
         echo "<td>Diff</td>";
         echo "<td>Luck</td>";
@@ -225,6 +231,7 @@
             echo "<span class='twide'>".$aBlock["PoolName"]."</span>";
             echo "<span class='tnarr' style='display: table; margin: 0 auto;'><div class='tnarr legend l".($aBlock["PoolID"]%6-1)."'></div></span>";
         echo "</td>\n";
+        // echo "<td class='twide'>".substr($aBlock["Hash"],0,8)."</td>\n";
         echo "<td>";
             echo "<span class='twide'>".date("Y-m-d H:i:s",strtotime($aBlock["FoundTime"]))."</span>";
             echo "<span class='tnarr'>".date("D H:i",strtotime($aBlock["FoundTime"]))."</span>";

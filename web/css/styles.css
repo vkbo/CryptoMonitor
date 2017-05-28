@@ -5,14 +5,19 @@
  */
 
 html {
-    background-color: #ffffff;
+    background-color: #e0e0e0;
 }
 
 body {
     padding: 40px;
     font-size: 15px;
     max-width: 900px;
-    background-color: #f7f7f7;
+    background-color: #ffffff;
+    margin: 20px auto;
+    box-shadow: 5px 5px 5px #a0a0a0;
+    -moz-box-shadow: 5px 5px 5px #a0a0a0;
+    -webkit-box-shadow: 5px 5px 5px #a0a0a0;
+    border: 1px solid #d0d0d0;
 }
 
 h1 {font-size: 2.00em; margin: 0em 0em 0.4em 0em;}
@@ -197,6 +202,11 @@ a:hover {color: #00aa00; text-decoration: underline;}
 
     body {
         padding: 4% 2%;
+        margin: 0;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+        border: none;
     }
 
     .table-wrap {

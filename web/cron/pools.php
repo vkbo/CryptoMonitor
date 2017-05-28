@@ -184,6 +184,39 @@
                 return;
             }
 
+            if(array_key_exists("payments",$aMining)) {
+                $nPay = floor(count($aMining["payments"])/2);
+
+                for($i=0; $i<$nPay; $i++) {
+                    $aPay     = explode(":",$aMining["payments"][$i*2]);
+                    $iPayTime = intval($aMining["payments"][$i*2+1]);
+
+                    if(count($aPay) != 4) continue;
+
+                    $sPayHash   = $aPay[0];
+                    $iPayAmount = intval($aPay[1]);
+                    $iPayMixin  = intval($aPay[3]);
+
+                    $SQL  = "INSERT IGNORE INTO pool_payments (";
+                    $SQL .= "TimeStamp, ";
+                    $SQL .= "PoolID, ";
+                    $SQL .= "WalletID, ";
+                    $SQL .= "TransactionTime, ";
+                    $SQL .= "TransactionHash, ";
+                    $SQL .= "Amount, ";
+                    $SQL .= "Mixin";
+                    $SQL .= ") VALUES (";
+                    $SQL .= "'".date("Y-m-d-H-i-s",$iTimeStamp)."',";
+                    $SQL .= "'".$iPoolID."',";
+                    $SQL .= "'".$aWallet["ID"]."',";
+                    $SQL .= "'".date("Y-m-d-H-i-s",$iPayTime)."',";
+                    $SQL .= "'".$sPayHash."',";
+                    $SQL .= "'".$iPayAmount."',";
+                    $SQL .= "'".$iPayMixin."')";
+                    if($bSave) $oDB->query($SQL);
+                }
+            }
+
             $iHashes    = intval(array_key_exists("hashes",$aMining["stats"]) ? $aMining["stats"]["hashes"] : 0);
             $iLastShare = intval(array_key_exists("lastShare",$aMining["stats"]) ? $aMining["stats"]["lastShare"] : 0);
             $sLastShare = date("Y-m-d-H-i-s",$iLastShare);
