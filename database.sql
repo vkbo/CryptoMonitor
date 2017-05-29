@@ -146,7 +146,8 @@ CREATE TABLE `wallets` (
 # Pool to Wallet Links Table
 
 CREATE TABLE `pool_wallet` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `PoolID` int(11) NOT NULL,
-  `WalletID` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`PoolID`)
+  `WalletID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -145,7 +145,7 @@
         $SQL .= "JOIN wallets AS w ON w.ID = pw.WalletID ";
         $SQL .= "LEFT JOIN pool_payments AS pp ON pp.PoolID = pw.PoolID AND pp.WalletID = pw.WalletID ";
         $SQL .= "JOIN (";
-        $SQL .=     "SELECT WalletID, PoolID,";
+        $SQL .=     "SELECT WalletID, PoolID, ";
         $SQL .=     "MAX(TimeStamp) AS LatestMining ";
         $SQL .=     "FROM cryptomonitor.mining ";
         $SQL .=     "GROUP BY WalletID, PoolID ";
@@ -154,7 +154,8 @@
         $SQL .=     "ON m.TimeStamp = t1.LatestMining ";
         $SQL .=     "AND m.PoolID = pw.PoolID ";
         $SQL .=     "AND m.WalletID = pw.WalletID ";
-        $SQL .= "WHERE pw.PoolID = '".$aPool["PoolID"]."'";
+        $SQL .= "WHERE pw.PoolID = '".$aPool["PoolID"]."' ";
+        $SQL .= "GROUP BY pw.WalletID";
         $oWallets = $oDB->query($SQL);
 
         while($aWallet = $oWallets->fetch_assoc()) {
@@ -162,12 +163,18 @@
             $dHashRate = floatval($aWallet["HashRate"]);
             $iBalance  = intval($aWallet["Balance"])/intval($aPool["CurrDispUnit"]);
             $iPayments = intval($aWallet["Payments"])/intval($aPool["CurrDispUnit"]);
-            $dCoinRate = $iHashes/($iBalance+$iPayments)*intval($aPool["CurrUnit"]);
+            $dCoinRate = $iHashes/($iBalance+$iPayments)*1000;
+            $dCoinTime = $dCoinRate/$dHashRate;
 
             echo "<h3>".$aWallet["WalletName"]." Wallet</h3>\n";
             echo "<div><b>Hashes:</b> ".rdblBigNum($iHashes,2,"H");
                 echo " (".rdblBigNum($dCoinRate,2,"H")."/".$aPool["CurrISO"].")</div>\n";
-            echo "<div><b>HashRate:</b> ".rdblBigNum($dHashRate,2,"H/s")."</div>\n";
+            echo "<div><b>HashRate:</b> ".rdblBigNum($dHashRate,2,"H/s");
+            if($dCoinTime > 48*3600) {
+                echo " (".rdblNum($dCoinTime/86400,2,"d")."/".$aPool["CurrISO"].")</div>\n";
+            } else {
+                echo " (".rdblNum($dCoinTime/3600,1,"h")."/".$aPool["CurrISO"].")</div>\n";
+            }
             echo "<div><b>Balance:</b> ".rdblNum($iBalance,2,$aPool["CurrDispName"])."</div>";
             echo "<div><b>Payments:</b> ".rdblNum($iPayments,2,$aPool["CurrDispName"])."</div>";
         }

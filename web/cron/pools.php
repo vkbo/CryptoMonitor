@@ -224,7 +224,7 @@
 
             $SQL  = "SELECT TimeStamp, Hashes ";
             $SQL .= "FROM mining ";
-            $SQL .= "WHERE TimeStamp >= '".date("Y-m-d-H-i-s",time()-3600)."' ";
+            $SQL .= "WHERE TimeStamp >= '".date("Y-m-d-H-i-s",time()-3660)."' ";
             $SQL .= "AND WalletID = '".$aWallet["ID"]."' ";
             $SQL .= "AND PoolID = '".$iPoolID."' ";
             $SQL .= "ORDER BY TimeStamp ";
