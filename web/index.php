@@ -91,7 +91,7 @@
     $SQL .=     "WHERE FoundTime > '".date("Y-m-d-H-i-s",time()-86400)."' ";
     $SQL .=     "GROUP BY PoolID";
     $SQL .= ") AS pb ON pb.PoolID = p.ID ";
-    $SQL .= "WHERE p.Active = 1 ";
+    $SQL .= "WHERE p.Active = 1 AND p.Display = 1 ";
     $SQL .= "ORDER BY pm.TimeStamp DESC, pm.ID DESC";
     $oPools = $oDB->query($SQL);
 
@@ -155,6 +155,7 @@
         $SQL .=     "AND m.PoolID = pw.PoolID ";
         $SQL .=     "AND m.WalletID = pw.WalletID ";
         $SQL .= "WHERE pw.PoolID = '".$aPool["PoolID"]."' ";
+        $SQL .= "AND pw.Display = 1 ";
         $SQL .= "GROUP BY pw.WalletID";
         $oWallets = $oDB->query($SQL);
 

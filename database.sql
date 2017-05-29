@@ -65,7 +65,8 @@ CREATE TABLE `pools` (
   `APIType` varchar(45) DEFAULT NULL,
   `APIOptions` varchar(255) DEFAULT NULL,
   `CurrencyID` int(11) DEFAULT NULL,
-  `Active` tinyint(4) DEFAULT NULL,
+  `Active` tinyint(1) NOT NULL DEFAULT '1',
+  `Display` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -140,6 +141,7 @@ CREATE TABLE `wallets` (
   `Owner` varchar(45) DEFAULT NULL,
   `Address` varchar(100) DEFAULT NULL,
   `CurrencyID` int(11) DEFAULT NULL,
+  `Active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -149,5 +151,6 @@ CREATE TABLE `pool_wallet` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `PoolID` int(11) NOT NULL,
   `WalletID` int(11) NOT NULL,
+  `Display` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -159,7 +159,8 @@
         $SQL .= "w.Address AS Address ";
         $SQL .= "FROM wallets AS w ";
         $SQL .= "LEFT JOIN pool_wallet AS pw ON w.ID = pw.WalletID ";
-        $SQL .= "WHERE pw.PoolID = '".$iPoolID."'";
+        $SQL .= "WHERE pw.PoolID = '".$iPoolID."' ";
+        $SQL .= "AND w.Active = 1";
         $oWallets = $oDB->query($SQL);
 
         if($oWallets === false) {
