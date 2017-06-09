@@ -165,7 +165,7 @@
             $iBalance  = intval($aWallet["Balance"])/intval($aPool["CurrDispUnit"]);
             $iPayments = intval($aWallet["Payments"])/intval($aPool["CurrDispUnit"]);
             $dCoinRate = $iHashes/($iBalance+$iPayments)*1000;
-            $dCoinTime = $dCoinRate/$dHashRate;
+            $dCoinTime = $dHashRate > 0 ? $dCoinRate/$dHashRate : INF;
 
             echo "<h3>".$aWallet["WalletName"]." Wallet</h3>\n";
             echo "<div><b>Hashes:</b> ".rdblBigNum($iHashes,2,"H");

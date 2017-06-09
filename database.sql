@@ -65,8 +65,8 @@ CREATE TABLE `pools` (
   `APIType` varchar(45) DEFAULT NULL,
   `APIOptions` varchar(255) DEFAULT NULL,
   `CurrencyID` int(11) DEFAULT NULL,
-  `Active` tinyint(1) NOT NULL DEFAULT '1',
-  `Display` tinyint(1) NOT NULL DEFAULT '1',
+  `Active` tinyint(1) DEFAULT NULL,
+  `Display` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
