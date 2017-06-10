@@ -3,4 +3,6 @@
     $cDBUser = "cryptomonitor";
     $cDBPass = "xxxxxxxxxxxx";
     $cDBMain = "cryptomonitor";
+
+    $cMinerLog = "";
 ?>

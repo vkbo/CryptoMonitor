@@ -26,6 +26,7 @@
         <ul>
             <?php
                 echo "<li><a href='index.php'>Main</a></li>";
+                echo "<li><a href='miners.php'>Miners</a></li>";
                 echo "<li><a href='node.php'>Node</a></li>";
                 echo "<li><a href='settings.php'>Settings</a></li>";
             ?>
