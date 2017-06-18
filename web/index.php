@@ -136,10 +136,10 @@
         $SQL  = "SELECT ";
         $SQL .= "pw.PoolID AS PoolID, ";
         $SQL .= "w.Name AS WalletName, ";
-        $SQL .= "m.Hashes AS Hashes, ";
-        $SQL .= "m.LastShare AS LastShare, ";
-        $SQL .= "m.Balance AS Balance, ";
-        $SQL .= "m.HashRate AS HashRate, ";
+        $SQL .= "ANY_VALUE(m.Hashes) AS Hashes, ";
+        $SQL .= "ANY_VALUE(m.LastShare) AS LastShare, ";
+        $SQL .= "ANY_VALUE(m.Balance) AS Balance, ";
+        $SQL .= "ANY_VALUE(m.HashRate) AS HashRate, ";
         $SQL .= "IF(SUM(pp.Amount) IS NULL, 0, SUM(pp.Amount)) AS Payments ";
         $SQL .= "FROM pool_wallet AS pw ";
         $SQL .= "JOIN wallets AS w ON w.ID = pw.WalletID ";
@@ -158,6 +158,13 @@
         $SQL .= "AND pw.Display = 1 ";
         $SQL .= "GROUP BY pw.WalletID";
         $oWallets = $oDB->query($SQL);
+
+        if($oWallets === false) {
+            echo "MySQL Query Failed ...<br />";
+            echo "Error: ".$oDB->db->error."<br />";
+            echo "The Query was:<br />";
+            echo str_replace("\n","<br />",$SQL);
+        }
 
         while($aWallet = $oWallets->fetch_assoc()) {
             $iHashes   = intval($aWallet["Hashes"]);
