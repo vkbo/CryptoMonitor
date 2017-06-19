@@ -48,6 +48,8 @@
         $sTime = $aHeader[1];
         $sHost = $aHeader[2];
         $sUnit = $aHeader[3];
+        $iTime = strtotime($sDate." ".$sTime);
+        $isOld = $iTime < time()-3600;
         echo "<tr class='list-section'>";
             echo "<td colspan=4>".$sUnit." on ".$sHost."</td>";
         echo "</tr>\n";
@@ -82,7 +84,7 @@
                 $dSum1 += floatval($aRows[6]);
                 $dSum2 += floatval($aRows[7]);
                 $dSum3 += floatval($aRows[8]);
-                echo "<tr class='list-row ".($oddEven%2==0?"even":"odd")."'>";
+                echo "<tr class='list-row ".($isOld?"r-":"").($oddEven%2==0?"even":"odd")."'>";
                     echo "<td class='right'>".$aRows[5]."</td>";
                     echo "<td class='right'>".$aRows[6]." H/s</td>";
                     echo "<td class='right'>".$aRows[7]." H/s</td>";
@@ -92,10 +94,12 @@
                 $oddEven++;
             }
         }
-        $dTot1 += $dSum1;
-        $dTot2 += $dSum2;
-        $dTot3 += $dSum3;
-        $nTotC += $nCores;
+        if(!$isOld) {
+            $dTot1 += $dSum1;
+            $dTot2 += $dSum2;
+            $dTot3 += $dSum3;
+            $nTotC += $nCores;
+        }
         echo "<tr class='list-foot'>";
             echo "<td class='right'>".$nCores."</td>";
             echo "<td class='right'>".number_format($dSum1,1,".","")." H/s</td>";
