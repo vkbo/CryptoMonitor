@@ -52,6 +52,19 @@
     // Page Header
     require_once("includes/header.php");
 
+    echo "<div class='totals'>\n";
+    echo "<h2>Totals</h2>\n";
+
+    $SQL   = "SELECT COUNT(ID) AS Count, SUM(Amount) AS Total FROM pool_payments";
+    $oPaid = $oDB->query($SQL);
+    if($oPaid !== false) {
+        $aPay = $oPaid->fetch_assoc();
+        echo "<div><b>Payments:</b> ".$aPay["Count"]." times</div>\n";
+        echo "<div><b>Total Paid:</b> ".rdblNum($aPay["Total"]/1e12,4,"XMR")."</div>\n";
+    }
+
+    echo "</div>\n";
+
     $SQL  = "SELECT ";
     $SQL .= "p.ID AS PoolID, ";
     $SQL .= "p.Name AS PoolName, ";
@@ -169,9 +182,9 @@
         while($aWallet = $oWallets->fetch_assoc()) {
             $iHashes   = intval($aWallet["Hashes"]);
             $dHashRate = floatval($aWallet["HashRate"]);
-            $iBalance  = intval($aWallet["Balance"])/intval($aPool["CurrDispUnit"]);
-            $iPayments = intval($aWallet["Payments"])/intval($aPool["CurrDispUnit"]);
-            $dCoinRate = $iHashes/($iBalance+$iPayments)*1000;
+            $iBalance  = intval($aWallet["Balance"]) /1e12;  //intval($aPool["CurrDispUnit"]);
+            $iPayments = intval($aWallet["Payments"])/1e12;  //intval($aPool["CurrDispUnit"]);
+            $dCoinRate = $iHashes/($iBalance+$iPayments);    //*1000;
             $dCoinTime = $dHashRate > 0 ? $dCoinRate/$dHashRate : INF;
 
             echo "<h3>".$aWallet["WalletName"]." Wallet</h3>\n";
@@ -183,8 +196,8 @@
             } else {
                 echo " (".rdblNum($dCoinTime/3600,1,"h")."/".$aPool["CurrISO"].")</div>\n";
             }
-            echo "<div><b>Balance:</b> ".rdblNum($iBalance,2,$aPool["CurrDispName"])."</div>";
-            echo "<div><b>Payments:</b> ".rdblNum($iPayments,2,$aPool["CurrDispName"])."</div>";
+            echo "<div><b>Balance:</b> ".rdblNum($iBalance,4,"XMR")."</div>";
+            echo "<div><b>Payments:</b> ".rdblNum($iPayments,4,"XMR")."</div>";
         }
         echo "</div>\n";
     }

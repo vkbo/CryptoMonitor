@@ -67,23 +67,43 @@ a:hover {color: #00aa00; text-decoration: underline;}
  *  Mining Data
  */
 
+.totals,
 .pool-stats {
     max-width: 400px;
-    /*border: 1px solid #999999;*/
-    display: inline-block;
-    margin: 0 40px 20px 0;
     vertical-align: top;
+    display: inline-block;
+    white-space: nowrap;
 }
 
+.totals {
+    background-color: #eeeeee;
+    padding: 6px;
+    border: 1px dotted #555555;
+    float: right;
+    margin: 0 0 20px 0;
+}
+
+.pool-stats {
+    margin: 0 40px 20px 0;
+}
+
+.totals h2,
 .pool-stats h2 {
     margin: 4px 0 8px 0;
 }
+
+.totals h3,
 .pool-stats h3 {
     margin: 8px 0 4px 0;
 }
 
 .pool-stats div b {
     width: 105px;
+    display: inline-block;
+}
+
+.totals div b {
+    width: 80px;
     display: inline-block;
 }
 
@@ -271,5 +291,15 @@ a:hover {color: #00aa00; text-decoration: underline;}
 
     .twide {
         display: none;
+    }
+
+    .totals {
+        float: none;
+        margin: 0 0 20px 0;
+        display: block;
+    }
+
+    .totals div b {
+        width: 98px;
     }
 }
