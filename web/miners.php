@@ -50,6 +50,7 @@
         $sUnit = $aHeader[3];
         $iTime = strtotime($sDate." ".$sTime);
         $isOld = $iTime < time()-3600;
+        if($iTime < time()-86400) continue;
         echo "<tr class='list-section'>";
             echo "<td colspan=4>".$sUnit." on ".$sHost."</td>";
         echo "</tr>\n";
