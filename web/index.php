@@ -218,7 +218,7 @@
     $SQL .= "FROM pool_blocks AS pb ";
     $SQL .= "JOIN pools AS p ON pb.PoolID = p.ID ";
     $SQL .= "ORDER BY pb.Height DESC ";
-    $SQL .= "LIMIT 0,50";
+    $SQL .= "LIMIT 0,100";
     $oBlocks = $oDB->query($SQL);
 
     echo "<h2>Blocks</h2>\n";
