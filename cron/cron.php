@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
    /**
     *  Crypto Monitor – Cron Script
@@ -8,10 +9,10 @@
 
     $bCron = true;
     require_once("config.php");
-    require_once("cron/functions.php");
-    require_once("cron/pools.php");
-    require_once("cron/hourly.php");
-    require_once("cron/daily.php");
+    require_once("functions.php");
+    require_once("pools.php");
+    require_once("hourly.php");
+    require_once("daily.php");
 
     // BEGIN Cron Settings
     $bSave   = true;

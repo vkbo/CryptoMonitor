@@ -1,3 +1,4 @@
 web/config.php
+cron/config.php
 web/cron-test.php
 publishSite.sh
