@@ -121,7 +121,7 @@
         } else {
             $dLuckP = 100*($dDiff-$dLuck)/$dLuck;
         }
-        $dCoinRate = $dLuck/$dReward*intval($aPool["CurrUnit"]);
+        $dNCoinRate = $dLuck/$dReward*intval($aPool["CurrUnit"]);
 
         if(time()-$iTimeStamp > 1820) {
             $sTimeCol = "red";
@@ -142,7 +142,7 @@
             echo $aPool["BlockOrphaned"]." orphaned</div>\n";
         // echo "<div><b>Last Block:</b> ".rdblSeconds($iTimeStamp-$iLastBlock).", ";
         echo "<div><b>Luck (24h):</b> ".rdblNum($dLuckP,1,"%");
-            echo " (".rdblBigNum($dCoinRate,2,"H")."/".$aPool["CurrISO"].")</div>";
+            echo " (".rdblBigNum($dNCoinRate,2,"H")."/".$aPool["CurrISO"].")</div>";
         echo "<div><b>Diff (24h):</b> ".rdblBigNum($dDiff,2);
             echo " (".rdblBigNum($dDiff/120,2,"H/s").")</div>";
 
@@ -185,7 +185,7 @@
             $iBalance  = intval($aWallet["Balance"]) /1e12;  //intval($aPool["CurrDispUnit"]);
             $iPayments = intval($aWallet["Payments"])/1e12;  //intval($aPool["CurrDispUnit"]);
             $dCoinRate = $iHashes/($iBalance+$iPayments);    //*1000;
-            $dCoinTime = $dHashRate > 0 ? $dCoinRate/$dHashRate : INF;
+            $dCoinTime = $dHashRate > 0 ? $dNCoinRate/$dHashRate : INF;
 
             echo "<h3>".$aWallet["WalletName"]." Wallet</h3>\n";
             echo "<div><b>Hashes:</b> ".rdblBigNum($iHashes,2,"H");
